@@ -46,7 +46,12 @@ def run_bot(TOKEN):
             await message.channel.send("&caption i am a bot!")
         if message.content.lower() == ".help":
             await message.channel.send("**rgif**\n- randomly upload gif (gif cannot be used for other commands)\n**givetext** \n- returns the text contains on the last sent gif (works best with caption gifs, non-captions gifs may be inaccurate)\n**lastgif**\n- returns the last gif send to the channel (last gif sent when giffyBot was online)\n**decaption**\n- removes the top caption of the last send gif, does not alter non-caption gifs")
-
+        if message.content.lower() == ".cgif":
+            gif = get_last(message)
+            if is_caption_gif(gif):
+                await message.channel.send("The last gif has a caption")
+            else:
+                await message.channel.send("The last gif does not have a caption")
         if message.content.lower() == ".rgif":
             gif = random.choice(os.listdir("downloaded_gifs"))
             await message.channel.send(file=discord.File(f"downloaded_gifs/{gif}"))

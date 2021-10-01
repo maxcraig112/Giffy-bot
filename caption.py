@@ -6,7 +6,7 @@ import uuid
 from typing import Text
 import requests
 import urllib.request
-import shutil
+from shutil import *
 from PIL import Image
 from PIL import GifImagePlugin
 import numpy as np
@@ -21,21 +21,25 @@ def get_image(image_path: str):
     - tenor url
     And converts it into PIL Image Object
     """
-    if type(image_path) is not str:
-        #image_path must already be in Object form
-        return image_path
-    if validators.url(image_path):
-        r = requests.get(image_path, stream=True)
-        if "tenor" in image_path:
-            soup = BeautifulSoup(r.content)
-            res = soup.findAll('div' , class_="Gif")
-            res = res[0].img['src']
-            r = requests.get(res, stream=True)
-        img = Image.open(BytesIO(r.content))
-        #img.show()
-    else:
-        img = Image.open(image_path)
-    return img
+    try:
+        if type(image_path) is not str:
+            #image_path must already be in Object form
+            return image_path
+        if validators.url(image_path):
+            r = requests.get(image_path, stream=True)
+            if "tenor" in image_path:
+                soup = BeautifulSoup(r.content)
+                res = soup.findAll('div' , class_="Gif")
+                res = res[0].img['src']
+                r = requests.get(res, stream=True)
+            img = Image.open(BytesIO(r.content))
+            #img.show()
+        else:
+            img = Image.open(image_path)
+        return img
+    except:
+        print(f"could not open image {image_path}")
+        return None
 def get_file_name(file_name: str, path: str,file_type: bool = False, specific_format: str = None ):
     res = ""
     if file_name is None:
@@ -49,37 +53,40 @@ def get_file_name(file_name: str, path: str,file_type: bool = False, specific_fo
     elif specific_format is not None:
         res += specific_format
     return res
-def get_boundary(img, background: tuple) -> tuple:
-    size = img.size
-    if(background[0] in range(220,256) and background[1] in range(220,256) and background[2] in range(220,256)):
-        boundary = 0
-        x = img.getpixel((0,boundary))
-        while(boundary < size[1] and x == background):
+def get_boundary(img) -> tuple:
+    img = get_image(img)
+    if img is not None:
+        img = img.convert('RGBA')
+        #size = img.size
+        background = img.getpixel((0,0))
+        size = img.size
+        if(background[0] in range(220,256) and background[1] in range(220,256) and background[2] in range(220,256) and background[3] != 0):
+            boundary = 0
             x = img.getpixel((0,boundary))
-            boundary += 10
-        if boundary >= size[1]:
-            #return None
-            boundary -= 10
-        while(img.getpixel((0,boundary)) != background):
-            boundary -= 1
-        if boundary in range(int(size[1] * 0.95),size[1] + 1):
-            #if caption takes up over 95% of the screen, gif most likely isn't a caption gif, but instead is just solid white background
-            return None
-        i = 0
-        while i < size[0]:
-            if (background[0] not in range(220,256) and background[1] not in range(220,256) and background[2] not in range(220,256)):
-                #if there are any pixels at the bottom of the caption which are not the colour of the caption background
-                #then the image must not be a caption gif
+            while(boundary < size[1] and x == background):
+                x = img.getpixel((0,boundary))
+                boundary += 10
+            if boundary >= size[1]:
+                #return None
+                boundary -= 10
+            while(img.getpixel((0,boundary)) != background):
+                boundary -= 1
+            if boundary in range(int(size[1] * 0.95),size[1] + 1):
+                #if caption takes up over 95% of the screen, gif most likely isn't a caption gif, but instead is just solid white background
                 return None
-            i  += 10
-        return (size[0],boundary)
+            i = 0
+            while i < size[0]:
+                x = img.getpixel((i,boundary))
+                if (x[0] not in range(220,256) and x[1] not in range(220,256) and x[2] not in range(220,256)):
+                    #if there are any pixels at the bottom of the caption which are not the colour of the caption background
+                    #then the image must not be a caption gif
+                    return None
+                i  += 10
+            return (size[0],boundary)
     return None
 def get_top_caption(img, save: bool = False, file_name: str = None, path: str = None):
-    img = get_image(img)
-    pix = img.convert('RGB')
-    #size = img.size
-    background = pix.getpixel((0,0))
-    boundary = get_boundary(pix, background)
+    boundary = get_boundary(img)
+    pix = img.convert('RGBA')
     if boundary is not None:
         caption = pix.crop((0,0,boundary[0],boundary[1]))
         if save:
@@ -93,12 +100,18 @@ def get_top_caption(img, save: bool = False, file_name: str = None, path: str = 
         return caption
     return None
 def get_text_from_caption_gif(image_path: str):
+
     img = get_image(image_path)
-    caption = get_top_caption(img)
-    if caption is not None:
-        return pytesseract.image_to_string(caption.resize(tuple(4*x for x in caption.size)))[:-2].replace("\n"," ")
-    else:
-        return "No caption found, text may not be accurate\n" + pytesseract.image_to_string(img).replace("\n"," ")
+    if img is not None:
+        caption = get_top_caption(img)
+        if caption is not None:
+            return pytesseract.image_to_string(caption.resize(tuple(4*x for x in caption.size)))[:-2].replace("\n"," ")
+        else:
+            return "No caption found, text may not be accurate\n" + pytesseract.image_to_string(img).replace("\n"," ")
+    return ""
+def is_caption_gif(img) -> bool:
+    res = get_boundary(img)
+    return res is not None
 def download_file(url: str, file_name: str = None, path: str = None) -> str:
     try:
         r = requests.get(url, stream=True)
@@ -141,26 +154,27 @@ def crop_and_save(img,boundary: tuple,file_name: str = None, path:str = None):
     frames[0].save(file_name, format="GIF",append_images=frames[1:],save_all=True)
 def de_caption_gif(img, file_name: str = None, path:str = None):
     img = get_image(img)
-    # if type(img) is str:
-    #     if validators.url(img):
-    #         response = requests.get(img)
-    #         if "tenor" in img:
-    #             soup = BeautifulSoup(response.content)
-    #             res = soup.findAll('div' , class_="Gif")
-    #             res = res[0].img['src']
-    #             response = requests.get(res)
-    #         img = Image.open(BytesIO(response.content))
-    #     else:
-    #         img = Image.open(img)
-    pix = img.convert('RGB')
-    background = pix.getpixel((0,0))
-    boundary = get_boundary(pix, background)
-    if boundary is not None:
-        crop_and_save(img,(0,boundary[1]+1,boundary[0],pix.size[1]), file_name, path)
-        return True
-    else:
-        print("gif does not contain a caption")
-        return False
+    if img is not None:
+        # if type(img) is str:
+        #     if validators.url(img):
+        #         response = requests.get(img)
+        #         if "tenor" in img:
+        #             soup = BeautifulSoup(response.content)
+        #             res = soup.findAll('div' , class_="Gif")
+        #             res = res[0].img['src']
+        #             response = requests.get(res)
+        #         img = Image.open(BytesIO(response.content))
+        #     else:
+        #         img = Image.open(img)
+        boundary = get_boundary(img)
+        pix = img.convert('RGBA')
+        if boundary is not None:
+            crop_and_save(img,(0,boundary[1]+1,boundary[0],pix.size[1]), file_name, path)
+            return True
+        else:
+            print("gif does not contain a caption")
+            return False
+    return None
 def read_file(file_name) -> list:
     lst = []
     try:
@@ -171,6 +185,17 @@ def read_file(file_name) -> list:
         print(f"{file_name} does not exist")
     return lst
 if __name__ == "__main__":
+    img = Image.open('failed_gifs/58852138-227f-11ec-9f72-5cf370a080b0.gif')
+    img = img.convert("RGBA")
+    print(img.getpixel((0,0)))
+
+    #Code for getting all caption gifs from a folder of unfiltered gifs
+    #Used to test robustness of is_caption_gif function
+    for gif in os.listdir("downloaded_gifs"):
+        if is_caption_gif(f"downloaded_gifs/{gif}"):
+            copyfile(f"downloaded_gifs/{gif}",f"caption_gifs/{gif}")
+
+
     #TESSERACT FILE ADDRESS IS SPECIFIC TO USER, AS GITHUB IS SHIT
 
     #Code for downloading all gifs in FILE_NAME to folders
@@ -180,21 +205,7 @@ if __name__ == "__main__":
     FILE_NAME = 'cleangif.txt'
     GIF_FOLDER = 'downloaded_gifs'
     CAPTION_FOLDER = 'captions'
-    DECAPTION_FOLDER = 'decaptioned_memes'
-
-    caption_count = 0
-    non_caption = 0
-    for gif in os.listdir('downloaded_gifs'):
-        img = get_image(f"downloaded_gifs/{gif}")
-        pix = img.convert('RGB')
-        background = pix.getpixel((0,0))
-        if get_boundary(img,background) is not None:
-            caption_count += 1
-        else:
-            non_caption += 1
-    
-    print(f"Caption Count: {caption_count}\nNon_Caption Count: {non_caption}\nPercentage Caption Gif: {((caption_count)/(caption_count + non_caption))*100}")
-            
+    DECAPTION_FOLDER = 'decaptioned_memes'        
     """
     if not os.path.isdir(GIF_FOLDER):
         os.makedirs(GIF_FOLDER)
