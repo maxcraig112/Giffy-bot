@@ -96,7 +96,7 @@ def get_text_from_caption_gif(image_path: str):
     img = get_image(image_path)
     caption = get_top_caption(img)
     if caption is not None:
-        return pytesseract.image_to_string(img.resize(tuple(4*x for x in img.size)))[:-2].replace("\n"," ")
+        return pytesseract.image_to_string(caption.resize(tuple(4*x for x in caption.size)))[:-2].replace("\n"," ")
     else:
         return "No caption found, text may not be accurate\n" + pytesseract.image_to_string(img).replace("\n"," ")
 def download_file(url: str, file_name: str = None, path: str = None) -> str:

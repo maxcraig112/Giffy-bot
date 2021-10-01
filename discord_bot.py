@@ -1,5 +1,6 @@
 import json
 import os
+import random
 from caption import *
 import discord
 import validators
@@ -36,15 +37,25 @@ def run_bot(TOKEN):
 
     @client.event
     async def on_message(message):
+        """
         #if message send is of bot, send nothing (otherwise inf loop)
         if message.author == client.user:
             return
-        
+        """
+        if message.content.lower() == ".test":
+            await message.channel.send("&caption i am a bot!")
+        if message.content.lower() == ".help":
+            await message.channel.send("**rgif**\n- randomly upload gif (gif cannot be used for other commands)\n**givetext** \n- returns the text contains on the last sent gif (works best with caption gifs, non-captions gifs may be inaccurate)\n**lastgif**\n- returns the last gif send to the channel (last gif sent when giffyBot was online)\n**decaption**\n- removes the top caption of the last send gif, does not alter non-caption gifs")
+
+        if message.content.lower() == ".rgif":
+            gif = random.choice(os.listdir("downloaded_gifs"))
+            await message.channel.send(file=discord.File(f"downloaded_gifs/{gif}"))
+
         if message.content.lower() == ".givetext":
             gif = get_last(message)
             if gif is not None:
                 text = get_text_from_caption_gif(gif)
-                if text is not "":
+                if text != "":
                     await message.channel.send(text)
                 else:
                     await message.channel.send("no text found")
@@ -72,6 +83,7 @@ def run_bot(TOKEN):
                     await message.channel.send("previous gif does not contain a caption")
             else:
                 await message.channel.send("No previous gifs found in channel. This may be because I haven't been in the server long or I was offline when a gif was sent!")
+
         if len(message.attachments) > 0:
             #if the user has send an attachment, the last attachment send will be added to json
             f = open("gifs.json", "r")
