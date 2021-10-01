@@ -171,6 +171,8 @@ def read_file(file_name) -> list:
         print(f"{file_name} does not exist")
     return lst
 if __name__ == "__main__":
+    #TESSERACT FILE ADDRESS IS SPECIFIC TO USER, AS GITHUB IS SHIT
+
     #Code for downloading all gifs in FILE_NAME to folders
     #Just comment out get_top_caption & de_caption_gif if you don't need/want the edited original gifs saved
     #Also all gifs being saved are name by the increment they were in the list
