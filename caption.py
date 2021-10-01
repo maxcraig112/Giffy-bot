@@ -181,6 +181,21 @@ if __name__ == "__main__":
     GIF_FOLDER = 'downloaded_gifs'
     CAPTION_FOLDER = 'captions'
     DECAPTION_FOLDER = 'decaptioned_memes'
+
+    caption_count = 0
+    non_caption = 0
+    for gif in os.listdir('downloaded_gifs'):
+        img = get_image(f"downloaded_gifs/{gif}")
+        pix = img.convert('RGB')
+        background = pix.getpixel((0,0))
+        if get_boundary(img,background) is not None:
+            caption_count += 1
+        else:
+            non_caption += 1
+    
+    print(f"Caption Count: {caption_count}\nNon_Caption Count: {non_caption}\nPercentage Caption Gif: {((caption_count)/(caption_count + non_caption))*100}")
+            
+    """
     if not os.path.isdir(GIF_FOLDER):
         os.makedirs(GIF_FOLDER)
     if not os.path.isdir(CAPTION_FOLDER):
@@ -190,9 +205,10 @@ if __name__ == "__main__":
     urls = read_file(FILE_NAME)
     for i in range(len(urls)):
         path = download_file(urls[i],None,GIF_FOLDER)
-        if path is not None:
-            get_top_caption(path,True, str(i),CAPTION_FOLDER)
-            de_caption_gif(path, str(i),DECAPTION_FOLDER)
+        #if path is not None:
+            #get_top_caption(path,True, str(i),CAPTION_FOLDER)
+            #de_caption_gif(path, str(i),DECAPTION_FOLDER)
+    """
             
 
     
