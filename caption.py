@@ -82,7 +82,7 @@ def get_boundary(img) -> tuple:
                     #then the image must not be a caption gif
                     return None
                 i  += 10
-            return (size[0],boundary)
+            return (size[0],boundary + 1)
     return None
 def get_top_caption(img, save: bool = False, file_name: str = None, path: str = None):
     boundary = get_boundary(img)
@@ -155,17 +155,6 @@ def crop_and_save(img,boundary: tuple,file_name: str = None, path:str = None):
 def de_caption_gif(img, file_name: str = None, path:str = None):
     img = get_image(img)
     if img is not None:
-        # if type(img) is str:
-        #     if validators.url(img):
-        #         response = requests.get(img)
-        #         if "tenor" in img:
-        #             soup = BeautifulSoup(response.content)
-        #             res = soup.findAll('div' , class_="Gif")
-        #             res = res[0].img['src']
-        #             response = requests.get(res)
-        #         img = Image.open(BytesIO(response.content))
-        #     else:
-        #         img = Image.open(img)
         boundary = get_boundary(img)
         pix = img.convert('RGBA')
         if boundary is not None:
