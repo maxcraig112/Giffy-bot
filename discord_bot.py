@@ -1,0 +1,106 @@
+import json
+import os
+from caption import *
+import discord
+import validators
+from discord.ext import commands
+
+def run_bot(TOKEN):
+
+    client = commands.Bot(command_prefix=".")
+
+    def get_last(message):
+        #get the last gif which was posted into the server
+            with open("gifs.json", "r") as f:
+                dict = json.load(f)
+                try:
+                    gif = dict[str(message.guild.id)][str(message.channel.id)]
+                    return gif
+                except KeyError:
+                    return None
+
+    @client.event
+    async def on_ready():
+        print("Bot is ready")
+
+    @client.command()
+    # async def getlast(message):
+    #     #get the last gif which was posted into the server
+    #     with open("gifs.json", "r") as f:
+    #         dict = json.load(f)
+    #         try:
+    #             gif = dict[message.guild.id][message.channel.id]
+    #             await message.channel.send(gif)
+    #         except KeyError:
+    #             await message.channel.send("No previous gifs found in channel. This may be because I haven't been in the server long or I was off when a gif was sent!")
+
+    @client.event
+    async def on_message(message):
+        #if message send is of bot, send nothing (otherwise inf loop)
+        if message.author == client.user:
+            return
+        
+        if message.content.lower() == ".givetext":
+            gif = get_last(message)
+            if gif is not None:
+                text = get_text_from_caption_gif(gif)
+                if text is not "":
+                    await message.channel.send(text)
+                else:
+                    await message.channel.send("no text found")
+            else:
+                await message.channel.send("No previous gifs found in channel. This may be because I haven't been in the server long or I was offline when a gif was sent!")
+
+        if message.content.lower() == ".lastgif":
+            gif = get_last(message)
+            if gif is not None:
+                await message.channel.send(gif)
+                return
+            else:
+                await message.channel.send("No previous gifs found in channel. This may be because I haven't been in the server long or I was offline when a gif was sent!")
+
+        if message.content.lower() == ".decaption":
+            gif = get_last(message)
+            if gif is not None:
+                await message.channel.send("decaptioning gif! give me a second to work!")
+                res = de_caption_gif(gif,"temp")
+                if res:
+                    await message.channel.send(file=discord.File("temp.gif"))
+                    #remove temporary file after it's been send
+                    os.remove("temp.gif")
+                else:
+                    await message.channel.send("previous gif does not contain a caption")
+            else:
+                await message.channel.send("No previous gifs found in channel. This may be because I haven't been in the server long or I was offline when a gif was sent!")
+        if len(message.attachments) > 0:
+            #if the user has send an attachment, the last attachment send will be added to json
+            f = open("gifs.json", "r")
+            dict = json.load(f)
+            if str(message.guild.id) not in dict: #if json database does not have key for current server
+                dict[str(message.guild.id)] = {}  #add current server to json database
+            #add url to key of channel.id. whether or not it exists, it will be created or placed there
+            dict[str(message.guild.id)][str(message.channel.id)] = str(message.attachments[-1])
+            f.close()
+            with open("gifs.json","w") as fw:
+                json.dump(dict, fw, indent=4)
+        
+        #if the message send in chat is a url (very buggy, lets assume that all urls are pictures)
+        if validators.url(message.content):
+           f = open("gifs.json", "r")
+           dict = json.load(f)
+           if str(message.guild.id) not in dict: #if json database does not have key for current server
+               dict[str(message.guild.id)] = {}  #add current server to json database
+            #add url to key of channel.id. whether or not it exists, it will be created or placed there
+           dict[str(message.guild.id)][str(message.channel.id)] = message.content
+           f.close()
+           with open("gifs.json","w") as fw:
+               json.dump(dict, fw, indent=4)
+    
+    client.run(TOKEN)
+if __name__ == "__main__":
+    # with open("test.json", "w") as f:
+    #     json.dump({"age": "17"},f,indent=4)
+    TOKEN = "ODkzMjkzMDc0NDEzOTE2MjMw.YVZWAQ.ThvEfXAcwD36XF9uedCWydq8D-c"
+    run_bot(TOKEN)
+    #https://discord.com/api/oauth2/authorize?client_id=893293074413916230&permissions=8&scope=bot
+    #https://discordpy.readthedocs.io/en/stable/api.html#
