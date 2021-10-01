@@ -11,7 +11,7 @@ from PIL import Image
 from PIL import GifImagePlugin
 import numpy as np
 from pytesseract import *
-pytesseract.tesseract_cmd = 'Tesseract/tesseract.exe'
+pytesseract.tesseract_cmd = 'C:/Users/maxcr/Desktop/Executables/Tesseract/tesseract.exe'
 
 def get_image(image_path: str):
     """
