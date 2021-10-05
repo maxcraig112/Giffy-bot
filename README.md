@@ -10,6 +10,7 @@ Current list of Bot Commands
 - store last gif posted to server
 
 Aims of the bot
+- Scraping caption gifs off tenor using API
 - the user is able to enter a sentence to be used in a caption gif and the program can return an appropriate captionless gif to use
     - This could be achieved by analysing each word in the sentence, seperating it into nouns, adjectives, verbs. Then using those as search queries
     - Somehow scraping a large list of caption gifs, analysing the words they contain, grouping them together under similar subjects, and then using either a Neural Network or some   math to find the correct gif (certain words could link to gifs with a higher average red colour etc.) 

@@ -7,8 +7,7 @@ from typing import Text
 import requests
 import urllib.request
 from shutil import *
-from PIL import Image
-from PIL import GifImagePlugin
+from PIL import Image, ImageDraw, ImageFont, ImageOps
 import numpy as np
 from pytesseract import *
 pytesseract.tesseract_cmd = 'C:/Users/maxcr/Desktop/Executables/Tesseract/tesseract.exe'
@@ -145,11 +144,16 @@ def download_file(url: str, file_name: str = None, path: str = None) -> str:
             pass
         print(f"{url} could not be downloaded" )
         return None
-def crop_and_save(img,boundary: tuple,file_name: str = None, path:str = None):
+def get_frames(img,boundary: tuple = None) -> list:
+    if boundary is None:
+        boundary = (0,0,img.size[0],img.size[1])
     frames = []
     for i in range(0,img.n_frames):
         img.seek(i)
-        frames += [img.crop(boundary)]
+        frames += [img.crop(boundary).convert("RGBA")]
+    return frames
+def crop_and_save(img,boundary: tuple,file_name: str = None, path:str = None):
+    frames = get_frames(img,boundary)
     file_name = get_file_name(file_name,path,specific_format=".gif")
     frames[0].save(file_name, format="GIF",append_images=frames[1:],save_all=True)
 def de_caption_gif(img, file_name: str = None, path:str = None):
@@ -164,6 +168,70 @@ def de_caption_gif(img, file_name: str = None, path:str = None):
             print("gif does not contain a caption")
             return False
     return None
+def caption_gif(img, msg: str, file_name: str = None, path: str = None):
+    img = get_image(img)
+    #print(img.mode,img.format)
+    FONT_PATH = "Myriad Pro Bold.ttf"
+    MIN_FONT_SIZE = 1
+    MAX_FONT_SIZE = max(30,int(img.size[0]/10))
+    VERTICAL_PADDING = int(0.06 * img.size[1]) #max(10,int(img.size[1]/25))
+    HORIZONTAL_PADDING = int(0.1 * img.size[0])#max(10,int(img.size[0]/100))
+    WIDTH, HEIGHT = img.size
+    MAX_SIZE = WIDTH - 2 * HORIZONTAL_PADDING
+    font_size = MAX_FONT_SIZE
+
+    # get a font
+    comparisonFont = ImageFont.truetype(FONT_PATH, font_size)
+    words = msg.split(" ")
+    word_size = [comparisonFont.getsize(words[i])[0] for i in range(len(words))] #Get width of all words within sentence
+    largest_word = words[word_size.index(max(word_size))]
+    largest_word_size = max(word_size)
+    while(largest_word_size > MAX_SIZE and font_size >= MIN_FONT_SIZE):
+        font_size -= 1
+        largest_word_size = ImageFont.truetype(FONT_PATH, font_size).getsize(largest_word)[0]
+    fnt = ImageFont.truetype(FONT_PATH, font_size)
+
+    lines = []
+    i = 0
+    while i < len(words):
+        line = words[i]
+        j = i
+        while j + 1 < len(words) and ImageFont.truetype(FONT_PATH, font_size).getsize(line + words[j+1] + " ")[0] <= MAX_SIZE:
+            j += 1
+            line += " " + words[j]
+        lines += [line]
+        i = j + 1
+    #print(lines)
+    NUM_LINES = len(lines)
+    WHITE_BAR_SIZE = (NUM_LINES + 1) * VERTICAL_PADDING + (NUM_LINES * ImageFont.truetype(FONT_PATH, font_size).getsize(lines[0])[1])
+    frames = get_frames(img)
+    #frames[0].show()
+
+    for i in range(len(frames)):
+        frames[i] = ImageOps.pad(frames[i], (WIDTH, HEIGHT + WHITE_BAR_SIZE), color=(255,255,255), centering=(0,1),method=Image.LANCZOS)
+        d = ImageDraw.Draw(frames[i])
+        for i in range(NUM_LINES):
+            pos = (WIDTH//2,(i + 1) * VERTICAL_PADDING + (i * ImageFont.truetype(FONT_PATH, font_size).getsize(lines[0])[1]))
+            d.text(pos,lines[i],(0,0,0),fnt,"mt",VERTICAL_PADDING)
+    #frames[0].show()
+    if file_name is None:
+        file_name = get_file_name(None,path,".gif")
+    frames[0].save(file_name, format="GIF",append_images=frames[1:],save_all=True,loop = 1)
+        
+
+    # get a drawing context
+    
+    # draw multiline text
+    # print(font_size)
+    # d.text((img.size[0]//2,0), msg, font=fnt, fill=(0, 0, 0), align="center",anchor="mt")
+    # print(d.textsize("Hello", font=fnt))
+    # img.show()
+def reduce_frames(img, reduction_factor: float = 0.5, file_name: str = None, path: str = None):
+    img = get_image(img)
+    frames = get_frames(img)
+    file_name = get_file_name(file_name,path)
+    frames = [frames[i] for i in range(0,len(frames),int(1/reduction_factor))]
+    frames[0].save(file_name, format="GIF",append_images=frames[1:],save_all=True,loop = 1)
 def read_file(file_name) -> list:
     lst = []
     try:
