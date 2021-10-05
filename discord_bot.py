@@ -134,28 +134,30 @@ def run_bot(TOKEN):
             else:
                 await message.channel.send("No previous gifs found in channel. This may be because I haven't been in the server long or I was offline when a gif was sent!")
         if len(message.attachments) > 0:
-            #if the user has send an attachment, the last attachment send will be added to json
-            f = open("gifs.json", "r")
-            dict = json.load(f)
-            if str(message.guild.id) not in dict: #if json database does not have key for current server
-                dict[str(message.guild.id)] = {}  #add current server to json database
-            #add url to key of channel.id. whether or not it exists, it will be created or placed there
-            dict[str(message.guild.id)][str(message.channel.id)] = str(message.attachments[-1])
-            f.close()
-            with open("gifs.json","w") as fw:
-                json.dump(dict, fw, indent=4)
+            if message.content[-4:] == ".gif" or "tenor" in message.content:
+                #if the user has send an attachment, the last attachment send will be added to json
+                f = open("gifs.json", "r")
+                dict = json.load(f)
+                if str(message.guild.id) not in dict: #if json database does not have key for current server
+                    dict[str(message.guild.id)] = {}  #add current server to json database
+                #add url to key of channel.id. whether or not it exists, it will be created or placed there
+                dict[str(message.guild.id)][str(message.channel.id)] = str(message.attachments[-1])
+                f.close()
+                with open("gifs.json","w") as fw:
+                    json.dump(dict, fw, indent=4)
         
         #if the message send in chat is a url (very buggy, lets assume that all urls are pictures)
         if validators.url(message.content):
-           f = open("gifs.json", "r")
-           dict = json.load(f)
-           if str(message.guild.id) not in dict: #if json database does not have key for current server
-               dict[str(message.guild.id)] = {}  #add current server to json database
-            #add url to key of channel.id. whether or not it exists, it will be created or placed there
-           dict[str(message.guild.id)][str(message.channel.id)] = message.content
-           f.close()
-           with open("gifs.json","w") as fw:
-               json.dump(dict, fw, indent=4)
+            if message.content[-4:] == ".gif" or "tenor" in message.content:
+                f = open("gifs.json", "r")
+                dict = json.load(f)
+                if str(message.guild.id) not in dict: #if json database does not have key for current server
+                    dict[str(message.guild.id)] = {}  #add current server to json database
+                    #add url to key of channel.id. whether or not it exists, it will be created or placed there
+                dict[str(message.guild.id)][str(message.channel.id)] = message.content
+                f.close()
+                with open("gifs.json","w") as fw:
+                    json.dump(dict, fw, indent=4)
     
     client.run(TOKEN)
 if __name__ == "__main__":
