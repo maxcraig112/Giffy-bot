@@ -105,9 +105,32 @@ def run_bot(TOKEN):
                         reduce_frames("temp.gif",reduction_factor,"temp.gif")
                     await message.channel.send(file=discord.File("temp.gif"))
                     #remove temporary file after it's been send
-                    #os.remove("temp.gif")
+                    os.remove("temp.gif")
                 else:
                     await message.channel.send("Please provide a caption!")
+            else:
+                await message.channel.send("No previous gifs found in channel. This may be because I haven't been in the server long or I was offline when a gif was sent!")
+        if message.content.lower().split(" ")[0] == ".recaption":
+            gif = get_last(message)
+            if gif is not None:
+                msg = message.content.split(" ", 1)[1]
+                if msg != "":
+                    await message.channel.send("recaptioning gif! give me a second to work!")
+                    res = de_caption_gif(gif,"temp")
+                    if res:
+                        caption_gif("temp.gif",msg,"temp.gif")
+                        if os.path.getsize("temp.gif") > 8000000:
+                            reduction_factor = min(0.5,8000000/os.path.getsize("temp.gif"))
+                            #await message.channel.send(f"caption gif was over discords file limit, so i reduced the frames by {100 - int(reduction_factor*100)}%")
+                            reduce_frames("temp.gif",reduction_factor,"temp.gif")
+                        await message.channel.send(file=discord.File("temp.gif"))
+                        #remove temporary file after it's been send
+                        os.remove("temp.gif")
+                    else:
+                        await message.channel.send("previous gif does not contain a caption")
+                else:
+                    await message.channel.send("Please provide a caption!")
+                
             else:
                 await message.channel.send("No previous gifs found in channel. This may be because I haven't been in the server long or I was offline when a gif was sent!")
         if len(message.attachments) > 0:

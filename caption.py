@@ -155,7 +155,7 @@ def get_frames(img,boundary: tuple = None) -> list:
 def crop_and_save(img,boundary: tuple,file_name: str = None, path:str = None):
     frames = get_frames(img,boundary)
     file_name = get_file_name(file_name,path,specific_format=".gif")
-    frames[0].save(file_name, format="GIF",append_images=frames[1:],save_all=True)
+    frames[0].save(file_name, format="GIF",append_images=frames[1:],save_all=True, loop=0)
 def de_caption_gif(img, file_name: str = None, path:str = None):
     img = get_image(img)
     if img is not None:
@@ -171,11 +171,13 @@ def de_caption_gif(img, file_name: str = None, path:str = None):
 def caption_gif(img, msg: str, file_name: str = None, path: str = None):
     img = get_image(img)
     #print(img.mode,img.format)
-    FONT_PATH = "Myriad Pro Bold.ttf"
+    #FONT_PATH = "Futura Bold.otf"
+    #FONT_PATH = "Myriad Pro Bold.ttf"
+    FONT_PATH = "Futura Extra Black Condensed Regular.otf"
     MIN_FONT_SIZE = 1
     MAX_FONT_SIZE = max(30,int(img.size[0]/10))
-    VERTICAL_PADDING = int(0.06 * img.size[1]) #max(10,int(img.size[1]/25))
-    HORIZONTAL_PADDING = int(0.1 * img.size[0])#max(10,int(img.size[0]/100))
+    VERTICAL_PADDING = int(0.05 * img.size[1]) #max(10,int(img.size[1]/25))
+    HORIZONTAL_PADDING = int(0.05 * img.size[0])#max(10,int(img.size[0]/100))
     WIDTH, HEIGHT = img.size
     MAX_SIZE = WIDTH - 2 * HORIZONTAL_PADDING
     font_size = MAX_FONT_SIZE
@@ -216,7 +218,7 @@ def caption_gif(img, msg: str, file_name: str = None, path: str = None):
     #frames[0].show()
     if file_name is None:
         file_name = get_file_name(None,path,".gif")
-    frames[0].save(file_name, format="GIF",append_images=frames[1:],save_all=True,loop = 1)
+    frames[0].save(file_name, format="GIF",append_images=frames[1:],save_all=True,loop = 0)
         
 
     # get a drawing context
@@ -231,7 +233,7 @@ def reduce_frames(img, reduction_factor: float = 0.5, file_name: str = None, pat
     frames = get_frames(img)
     file_name = get_file_name(file_name,path)
     frames = [frames[i] for i in range(0,len(frames),int(1/reduction_factor))]
-    frames[0].save(file_name, format="GIF",append_images=frames[1:],save_all=True,loop = 1)
+    frames[0].save(file_name, format="GIF",append_images=frames[1:],save_all=True,loop = 0)
 def read_file(file_name) -> list:
     lst = []
     try:
