@@ -101,7 +101,7 @@ def run_bot(TOKEN):
                     caption_gif(gif,msg,"temp.gif")
                     if os.path.getsize("temp.gif") > 8000000:
                         reduction_factor = min(0.5,8000000/os.path.getsize("temp.gif"))
-                        #await message.channel.send(f"caption gif was over discords file limit, so i reduced the frames by {100 - int(reduction_factor*100)}%")
+                        await message.channel.send(f"caption gif was over discords file limit, so i reduced the frames by {100 - int(reduction_factor*100)}%")
                         reduce_frames("temp.gif",reduction_factor,"temp.gif")
                     await message.channel.send(file=discord.File("temp.gif"))
                     #remove temporary file after it's been send
@@ -121,7 +121,7 @@ def run_bot(TOKEN):
                         caption_gif("temp.gif",msg,"temp.gif")
                         if os.path.getsize("temp.gif") > 8000000:
                             reduction_factor = min(0.5,8000000/os.path.getsize("temp.gif"))
-                            #await message.channel.send(f"caption gif was over discords file limit, so i reduced the frames by {100 - int(reduction_factor*100)}%")
+                            await message.channel.send(f"caption gif was over discords file limit, so i reduced the frames by {100 - int(reduction_factor*100)}%")
                             reduce_frames("temp.gif",reduction_factor,"temp.gif")
                         await message.channel.send(file=discord.File("temp.gif"))
                         #remove temporary file after it's been send

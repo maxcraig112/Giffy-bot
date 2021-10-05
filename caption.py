@@ -14,11 +14,10 @@ pytesseract.tesseract_cmd = 'C:/Users/maxcr/Desktop/Executables/Tesseract/tesser
 
 def get_image(image_path: str):
     """
-    Takes any form of image path
+    Takes any form of image path and converts it into PIL Image Object
     - url
     - directory path
     - tenor url
-    And converts it into PIL Image Object
     """
     try:
         if type(image_path) is not str:
@@ -145,12 +144,13 @@ def download_file(url: str, file_name: str = None, path: str = None) -> str:
         print(f"{url} could not be downloaded" )
         return None
 def get_frames(img,boundary: tuple = None) -> list:
-    if boundary is None:
-        boundary = (0,0,img.size[0],img.size[1])
     frames = []
     for i in range(0,img.n_frames):
         img.seek(i)
-        frames += [img.crop(boundary).convert("RGBA")]
+        if boundary is None:
+            frames += [img.convert("RGBA")]
+        else:
+            frames += [img.crop(boundary).convert("RGBA")]
     return frames
 def crop_and_save(img,boundary: tuple,file_name: str = None, path:str = None):
     frames = get_frames(img,boundary)
@@ -173,7 +173,7 @@ def caption_gif(img, msg: str, file_name: str = None, path: str = None):
     #print(img.mode,img.format)
     #FONT_PATH = "Futura Bold.otf"
     #FONT_PATH = "Myriad Pro Bold.ttf"
-    FONT_PATH = "Futura Extra Black Condensed Regular.otf"
+    FONT_PATH = "Fonts/Futura Extra Black Condensed Regular.otf"
     MIN_FONT_SIZE = 1
     MAX_FONT_SIZE = max(30,int(img.size[0]/10))
     VERTICAL_PADDING = int(0.05 * img.size[1]) #max(10,int(img.size[1]/25))
@@ -207,7 +207,9 @@ def caption_gif(img, msg: str, file_name: str = None, path: str = None):
     NUM_LINES = len(lines)
     WHITE_BAR_SIZE = (NUM_LINES + 1) * VERTICAL_PADDING + (NUM_LINES * ImageFont.truetype(FONT_PATH, font_size).getsize(lines[0])[1])
     frames = get_frames(img)
-    #frames[0].show()
+    DURATION = []
+    for i in range(len(frames)):
+        DURATION += [frames[0].info['duration']]
 
     for i in range(len(frames)):
         frames[i] = ImageOps.pad(frames[i], (WIDTH, HEIGHT + WHITE_BAR_SIZE), color=(255,255,255), centering=(0,1),method=Image.LANCZOS)
@@ -218,7 +220,7 @@ def caption_gif(img, msg: str, file_name: str = None, path: str = None):
     #frames[0].show()
     if file_name is None:
         file_name = get_file_name(None,path,".gif")
-    frames[0].save(file_name, format="GIF",append_images=frames[1:],save_all=True,loop = 0)
+    frames[0].save(file_name, format="GIF",append_images=frames[1:],save_all=True,loop = 0, duration=DURATION)
         
 
     # get a drawing context
