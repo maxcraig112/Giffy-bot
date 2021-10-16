@@ -56,7 +56,7 @@ class Gif:
                 img = Image.open(img)
             return img
         except:
-            print(f"could not open image {img}")
+            pass
         return img
 
     def _get_file_name(self, file_name: str, path: str):
@@ -158,7 +158,7 @@ class Gif:
     def text_from_caption(self) -> str:
         if self.img is not None:
             caption = get_top_caption()
-            if caption is not None:
+            if caption is not None and caption is not "":
                 return pytesseract.image_to_string(caption.resize(tuple(4*x for x in caption.size)))[:-2].replace("\n"," ")
             else:
                 return None

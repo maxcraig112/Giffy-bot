@@ -1,8 +1,9 @@
 import json
 import os
 import random
+from re import M
 from typing import Dict
-
+from gif import Gif
 from validators.url import url
 from caption import *
 import discord
@@ -23,6 +24,19 @@ def run_bot(TOKEN):
                 except KeyError:
                     return None
 
+    async def no_gif_found(message):
+        await message.channel.send("No previous gifs found in channel. This may be because I haven't been in the server long or I was offline when a gif was sent!")
+    
+    async def resize_and_send(gif, message):
+        gif.save("temp.gif")
+        while os.path.getsize("temp.gif") > 8000000:
+            await message.channel.send("Caption too big! resizing!")
+            gif = Gif("temp.gif")
+            gif.resize(0.75)
+            gif.save("temp.gif")
+        await message.channel.send(file=discord.File("temp.gif"))
+        os.remove("temp.gif")
+
     @client.event
     async def on_ready():
         print("Bot is ready")
@@ -31,175 +45,80 @@ def run_bot(TOKEN):
     async def on_message(message):
         msg = message.content.lower()
         try:
-            if message.content.lower() == ".help":
-                await message.channel.send("**rgif**\n- randomly upload gif (gif cannot be used for other commands)\n**givetext** \n- returns the text contains on the last sent gif (works best with caption gifs, non-captions gifs may be inaccurate)\n**lastgif**\n- returns the last gif send to the channel (last gif sent when giffyBot was online)\n**decaption**\n- removes the top caption of the last send gif, does not alter non-caption gifs")
-            if message.content.lower() == ".cgif":
-                gif = get_last(message)
-                if is_caption_gif(gif):
-                    await message.channel.send("The last gif has a caption")
+            if msg == ".cgif":
+                gif = Gif(get_last(message))
+                if gif.img is not None:
+                    if gif.is_caption_gif():
+                        await message.channel.send("The last gif has a caption")
+                    else:
+                        await message.channel.send("The last gif does not have a caption")
                 else:
-                    await message.channel.send("The last gif does not have a caption")
-            if message.content.lower() == ".rgif":
+                    no_gif_found(message)
+            if msg == ".rgif":
                 gif = random.choice(os.listdir("All gifs/downloaded_gifs"))
                 await message.channel.send(file=discord.File(f"All gifs/downloaded_gifs/{gif}"))
-            if message.content.lower() == ".givetext":
-                gif = get_last(message)
-                if gif is not None:
-                    text = get_text_from_caption_gif(gif)
-                    if text != "":
+            if msg == ".givetext":
+                gif = Gif(get_last(message))
+                if gif.img is not None:
+                    text = gif.text_from_caption()
+                    if text is not None:
                         await message.channel.send(text)
                     else:
                         await message.channel.send("no text found")
                 else:
-                    await message.channel.send("No previous gifs found in channel. This may be because I haven't been in the server long or I was offline when a gif was sent!")
-            if message.content.lower() == ".lastgif":
+                    no_gif_found(message)
+            if msg == ".lastgif":
                 gif = get_last(message)
-                if gif is not None:
+                if gif.img is not None:
                     await message.channel.send(gif)
-                    return
                 else:
-                    await message.channel.send("No previous gifs found in channel. This may be because I haven't been in the server long or I was offline when a gif was sent!")
-            if message.content.lower() == ".decaption":
-                gif = get_last(message)
-                if gif is not None:
+                    no_gif_found(message)
+            if msg == ".decaption":
+                gif = Gif(get_last(message))
+                if gif.img is not None:
                     await message.channel.send("decaptioning gif! give me a second to work!")
-                    res = de_caption_gif(gif,"temp")
-                    if res:
-                        # if os.path.getsize("temp.gif") > 8000000:
-                        #     reduction_factor = min(0.5,8000000/os.path.getsize("temp.gif"))
-                        #     #await message.channel.send(f"caption gif was over discords file limit, so i reduced the frames by {100 - int(reduction_factor*100)}%")
-                        #     reduce_frames(res,reduction_factor,"temp.gif")
-                        while os.path.getsize("temp.gif") > 8000000:
-                            await message.channel.send("Caption too big! resizing!")
-                            size = os.path.getsize("temp.gif")
-                            resize_file(res,size,7500000,"temp.gif")
-                        await message.channel.send(file=discord.File("temp.gif"))
-                        #remove temporary file after it's been send
-                        os.remove("temp.gif")
+                    if gif.is_caption_gif:
+                        gif.decaption()
+                        resize_and_send(gif, message)
                     else:
                         await message.channel.send("previous gif does not contain a caption")
                 else:
-                    await message.channel.send("No previous gifs found in channel. This may be because I haven't been in the server long or I was offline when a gif was sent!")
-            if message.content.lower().split(" ")[0] == ".caption":
-                gif = get_last(message)
-                if gif is not None:
+                    no_gif_found(message)
+            if msg.split(" ")[0] == ".caption":
+                gif = Gif(get_last(message))
+                if gif.img is not None:
                     await message.channel.send("captioning gif! give me a second to work!")
-                    msg = message.content.split(" ", 1)[1]
-                    if msg != "":
-                        caption_gif(gif,msg,"temp.gif")
-                        # if os.path.getsize("temp.gif") > 8000000:
-                        #     reduction_factor = min(0.5,8000000/os.path.getsize("temp.gif"))
-                        #     await message.channel.send(f"caption gif was over discords file limit, so i reduced the frames by {100 - int(reduction_factor*100)}%")
-                        #     reduce_frames("temp.gif",reduction_factor,"temp.gif")
-                        while os.path.getsize("temp.gif") > 8000000:
-                            await message.channel.send("Caption too big! resizing!")
-                            size = os.path.getsize("temp.gif")
-                            resize_file("temp.gif",size,7500000,"temp.gif")
-                        await message.channel.send(file=discord.File("temp.gif"))
-                        #remove temporary file after it's been send
-                        os.remove("temp.gif")
+                    text = message.content.split(" ", 1)[1]
+                    if text != "":
+                        gif.caption(text)
+                        resize_and_send(gif, message)
                     else:
                         await message.channel.send("Please provide a caption!")
                 else:
-                    await message.channel.send("No previous gifs found in channel. This may be because I haven't been in the server long or I was offline when a gif was sent!")
-            if message.content.lower().split(" ")[0] == ".recaption":
-                gif = get_last(message)
-                if gif is not None:
+                    no_gif_found(message)
+            if msg.split(" ")[0] == ".recaption":
+                gif = Gif(get_last(message))
+                if gif.img is not None:
                     msg = message.content.split(" ", 1)[1]
                     if msg != "":
                         await message.channel.send("recaptioning gif! give me a second to work!")
-                        res = de_caption_gif(gif,"temp")
-                        if res:
-                            caption_gif("temp.gif",msg,"temp.gif")
-                            # if os.path.getsize("temp.gif") > 8000000:
-                            #     reduction_factor = min(0.5,8000000/os.path.getsize("temp.gif"))
-                            #     await message.channel.send(f"caption gif was over discords file limit, so i reduced the frames by {100 - int(reduction_factor*100)}%")
-                            #     reduce_frames("temp.gif",reduction_factor,"temp.gif")
-                            while os.path.getsize("temp.gif") > 8000000:
-                                size = os.path.getsize("temp.gif")
-                                resize_file("temp.gif",size,7500000,"temp.gif")
-                            await message.channel.send(file=discord.File("temp.gif"))
-                            #remove temporary file after it's been send
-                            os.remove("temp.gif")
-                        else:
-                            await message.channel.send("previous gif does not contain a caption")
+                        gif.decaption()
+                        gif.caption(text)
+                        resize_and_send(gif, message)
                     else:
                         await message.channel.send("Please provide a caption!")
-                    
-                else:
-                    await message.channel.send("No previous gifs found in channel. This may be because I haven't been in the server long or I was offline when a gif was sent!")
-            if message.content.lower().split(" ", 1)[0] == ".extcaption":
-                #if nothing sent, read entire caption from json, create caption, delete from json
-                if len(message.content.lower().split(" ",1)) == 1:
-                    f = open("caption.json", "r")
-                    dict = json.load(f)
-                    try:
-                        if str(message.guild.id) not in dict: #if json database does not have key for current server
-                            dict[str(message.guild.id)] = {}  #add current server to json database
-                            await message.channel.send("Please provide a caption!")
-                        elif str(message.channel.id) not in dict[str(message.guild.id)] or dict[str(message.guild.id)][str(message.channel.id)] == "":
-                            await message.channel.send("Please provide a caption!")
-                        else:
-                            caption = dict[str(message.guild.id)][str(message.channel.id)].replace("\n"," ")
-                            await message.channel.send(f"captioning gif! This caption is {len(caption)} characters!")
-                            dict[str(message.guild.id)][str(message.channel.id)] = ""
-                            f.close()
-                            with open("caption.json","w") as fw:
-                                json.dump(dict, fw, indent=4)
-                            gif = get_last(message)
-                            caption_gif(gif,caption,"temp.gif")
-                            while os.path.getsize("temp.gif") > 8000000:
-                                size = os.path.getsize("temp.gif")
-                                resize_file("temp.gif",size,7500000,"temp.gif")
-                            await message.channel.send(file=discord.File("temp.gif"))
-                            #remove temporary file after it's been send
-                            os.remove("temp.gif")
 
-                    except KeyError:
-                        await message.channel.send("Please provide a caption!")
-                #otherwise concatonate caption to existing json
                 else:
-                    f = open("caption.json", "r")
-                    dict = json.load(f)
-                    if str(message.guild.id) not in dict: #if json database does not have key for current server
-                            dict[str(message.guild.id)] = {}  #add current server to json database
-                    if str(message.channel.id) not in dict[str(message.guild.id)]:
-                        dict[str(message.guild.id)][str(message.channel.id)] = message.content.split(" ",1)[1]
-                    else:
-                        dict[str(message.guild.id)][str(message.channel.id)] = dict[str(message.guild.id)][str(message.channel.id)] + " " + message.content.split(" ",1)[1]
-                    f.close()
-                    with open("caption.json","w") as fw:
-                        json.dump(dict, fw, indent=4)
-            if message.content.lower() == ".speed":
-                gif = get_last(message)
-                if gif is not None:
+                    no_gif_found(message)
+            if msg == ".speed":
+                gif = Gif(get_last(message))
+                if gif.img is not None:
                     await message.channel.send("speeding up gif!")
-                    change_speed(gif,2,None,"temp.gif")
-                    while os.path.getsize("temp.gif") > 8000000:
-                        await message.channel.send("Caption too big! resizing!")
-                        size = os.path.getsize("temp.gif")
-                        resize_file(res,size,7500000,"temp.gif")
-                    await message.channel.send(file=discord.File("temp.gif"))
-                    #remove temporary file after it's been send
-                    os.remove("temp.gif")
+                    gif.change_speed()
+                    resize_and_send(gif, message)
                 else:
-                    await message.channel.send("No previous gifs found in channel. This may be because I haven't been in the server long or I was offline when a gif was sent!")
-            if message.content.lower() == ".superspeed":
-                gif = get_last(message)
-                if gif is not None:
-                    await message.channel.send("speeding up gif!")
-                    change_speed(gif,None,0.1,"temp.gif")
-                    while os.path.getsize("temp.gif") > 8000000:
-                        await message.channel.send("Caption too big! resizing!")
-                        size = os.path.getsize("temp.gif")
-                        resize_file(res,size,7500000,"temp.gif")
-                    await message.channel.send(file=discord.File("temp.gif"))
-                    #remove temporary file after it's been send
-                    os.remove("temp.gif")
-                else:
-                    await message.channel.send("No previous gifs found in channel. This may be because I haven't been in the server long or I was offline when a gif was sent!")
+                    no_gif_found(message)
             if len(message.attachments) > 0:
-                #print(message.attachments[-1])
                 # if message.attachments[-1][-4:] == ".gif" or "tenor" in message.content:
                 x = message.attachments[-1].url
                 if validators.url(x):
@@ -227,8 +146,7 @@ def run_bot(TOKEN):
                     with open("gifs.json","w") as fw:
                         json.dump(dict, fw, indent=4)
         except Exception as e:
-            print(e)
-            await message.channel.send("Oops! Something went wrong!")
+            await message.channel.send(f"{e}, Oops! Something went wrong!")
     
     client.run(TOKEN)
 if __name__ == "__main__":
