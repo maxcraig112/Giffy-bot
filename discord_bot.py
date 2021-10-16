@@ -47,7 +47,7 @@ def run_bot(TOKEN):
         try:
             if msg == ".cgif":
                 gif = Gif(get_last(message))
-                if gif.img is not None:
+                if gif.img != None:
                     if gif.is_caption_gif():
                         await message.channel.send("The last gif has a caption")
                     else:
@@ -59,9 +59,9 @@ def run_bot(TOKEN):
                 await message.channel.send(file=discord.File(f"All gifs/downloaded_gifs/{gif}"))
             if msg == ".givetext":
                 gif = Gif(get_last(message))
-                if gif.img is not None:
+                if gif.img != None:
                     text = gif.text_from_caption()
-                    if text is not None:
+                    if text != None:
                         await message.channel.send(text)
                     else:
                         await message.channel.send("no text found")
@@ -69,13 +69,13 @@ def run_bot(TOKEN):
                     no_gif_found(message)
             if msg == ".lastgif":
                 gif = get_last(message)
-                if gif.img is not None:
+                if gif.img != None:
                     await message.channel.send(gif)
                 else:
                     no_gif_found(message)
             if msg == ".decaption":
                 gif = Gif(get_last(message))
-                if gif.img is not None:
+                if gif.img != None:
                     await message.channel.send("decaptioning gif! give me a second to work!")
                     if gif.is_caption_gif:
                         gif.decaption()
@@ -86,7 +86,7 @@ def run_bot(TOKEN):
                     no_gif_found(message)
             if msg.split(" ")[0] == ".caption":
                 gif = Gif(get_last(message))
-                if gif.img is not None:
+                if gif.img != None:
                     await message.channel.send("captioning gif! give me a second to work!")
                     text = message.content.split(" ", 1)[1]
                     if text != "":
@@ -98,7 +98,7 @@ def run_bot(TOKEN):
                     no_gif_found(message)
             if msg.split(" ")[0] == ".recaption":
                 gif = Gif(get_last(message))
-                if gif.img is not None:
+                if gif.img != None:
                     msg = message.content.split(" ", 1)[1]
                     if msg != "":
                         await message.channel.send("recaptioning gif! give me a second to work!")
@@ -112,7 +112,7 @@ def run_bot(TOKEN):
                     no_gif_found(message)
             if msg == ".speed":
                 gif = Gif(get_last(message))
-                if gif.img is not None:
+                if gif.img != None:
                     await message.channel.send("speeding up gif!")
                     gif.change_speed()
                     resize_and_send(gif, message)
@@ -132,8 +132,6 @@ def run_bot(TOKEN):
                     f.close()
                     with open("gifs.json","w") as fw:
                         json.dump(dict, fw, indent=4)
-            
-            #if the message send in chat is a url (very buggy, lets assume that all urls are pictures)
             if validators.url(message.content):
                 if message.content[-4:] == ".gif" or "tenor" in message.content:
                     f = open("gifs.json", "r")
