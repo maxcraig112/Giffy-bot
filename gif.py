@@ -11,7 +11,7 @@ from PIL import Image, ImageDraw, ImageFont, ImageOps
 import numpy as np
 from pytesseract import *
 
-from caption import get_top_caption
+#from caption import get_top_caption
 pytesseract.tesseract_cmd = 'C:/Users/maxcr/Desktop/Executables/Tesseract/tesseract.exe'
 
 #Search from all gifs
@@ -21,11 +21,13 @@ pytesseract.tesseract_cmd = 'C:/Users/maxcr/Desktop/Executables/Tesseract/tesser
 class Gif:
 
     def __init__(self, image_reference: str) -> None:
-        self.img = self._get_image(image_reference)
-        self.width = self.img.size[0]
-        self.height = self.img.size[1]
-        self.frames = self._get_frames()
-        self.durations = self._get_duration()
+        self.img_reference = image_reference
+        self.img = None
+        self.frames = None
+        self.durations = None
+        self.width = None
+        self.height = None
+
 
     def _get_image(self,img):
         """
@@ -35,7 +37,7 @@ class Gif:
         OUTPUT: The original image path in PIL Image Object form
         """
         try:
-            if type(img) is not str:
+            if type(img) != str:
                 #image_path must already be in Object form
                 return img
             if validators.url(img):
@@ -54,10 +56,12 @@ class Gif:
             else:
                 #otherwise img is a directory path
                 img = Image.open(img)
-            return img
         except:
             pass
-        return img
+        self.img = img
+        self.frames = self._get_frames()
+        self.durations = self._get_duration()
+        self._update_size()
 
     def _get_file_name(self, file_name: str, path: str):
         res = ""
@@ -65,7 +69,7 @@ class Gif:
             res = str(uuid.uuid1())
         else:
             res += file_name
-        if path is not None:
+        if path != None:
             res = path + "/" + res
         return res
 
@@ -90,13 +94,17 @@ class Gif:
             duration += [self.frames[0].info["duration"]]
         return duration
 
+    def _update_size(self):
+        self.width = self.frames[0].size[0]
+        self.height = self.frames[0].size[1]
+
     def is_caption_gif(self) -> bool:
         """
         Gets the result of the get_boundary method, if the method returns a tuple,
         the Gif contains a caption, otherwise it doesn't
         """
-        res = self.get_boundary(self.img)
-        return res is not None
+        res = self.get_boundary()
+        return res != None
     
     def get_boundary(self) -> tuple:
         """
@@ -113,7 +121,10 @@ class Gif:
         a caption, this is because the 1st frame may be completely white, skewing results.
 
         """
-        if self.img is not None:
+        if self.img is None:
+            self.img = self._get_image(self.img_reference)
+
+        if self.img != None:
             image = self.frames[1]
             background = image.getpixel((5,0))
             rang = range(220,256)
@@ -150,31 +161,39 @@ class Gif:
         Will return None if gif does not contain a caption
         """
         boundary = self.get_boundary()
-        if boundary is not None:
+        if boundary != None:
             caption = self.frames[1].crop((0,0,boundary[0],boundary[1]))
             return caption
         return None
     
     def text_from_caption(self) -> str:
-        if self.img is not None:
-            caption = get_top_caption()
-            if caption is not None and caption is not "":
+        if self.img != None:
+            caption = self.get_top_caption()
+            if caption != None and caption != "":
                 return pytesseract.image_to_string(caption.resize(tuple(4*x for x in caption.size)))[:-2].replace("\n"," ")
             else:
                 return None
     
     def _crop(self, boundary: tuple,):
+        if self.img is None:
+            self.img = self._get_image(self.img_reference)
+
         for i in range(len(self.frames)):
             self.frames[i] = self.frames[i].crop(boundary)
+            self._update_size()
     
     def decaption(self):
         boundary = self.get_boundary()
-        if boundary is not None:
-            self._crop(boundary)
+        if boundary != None:
+            self._crop((0,boundary[1]+1,boundary[0],self.height))
+            self._update_size()
         else:
             return None
     
     def caption(self, msg):
+        if self.img is None:
+            self.img = self._get_image(self.img_reference)
+
         FONT_PATH = "Fonts/Futura Extra Black Condensed Regular.otf"
         MIN_FONT_SIZE = 1
         MAX_FONT_SIZE = max(30,int(self.width/10))
@@ -233,18 +252,43 @@ class Gif:
             new_frame.paste(text_caption,(0,0))
             new_frame.paste(self.frames[k],(0,WHITE_BAR_SIZE))
             self.frames[k] = new_frame
+        self._update_size()
 
     def change_speed(self, factor: float = 2, constant: int = None):
+        if self.img is None:
+            self.img = self._get_image(self.img_reference)
+
         for i in range(len(self.durations)):
             self.durations[i] = int(self.durations[i]/factor)
     
     def resize(self, factor: int):
+        if self.img is None:
+            self.img = self._get_image(self.img_reference)
+
         for i in range(len(self.frames)):
             self.frames[i] = self.frames[i].resize((int(self.width*factor),int(self.height*factor)))
+        self._update_size()
     
     def reduce_frames(self, factor: float = 0.5):
+        if self.img is None:
+            self.img = self._get_image(self.img_reference)
+
         self.frames = [self.frames[i] for i in range(0,len(self.frames),int(1/factor))]
 
     def save(self, file_name: str = None, path: str = None):
+        if self.img is None:
+            self.img = self._get_image(self.img_reference)
+
         file_name = self._get_file_name(file_name,path)
-        self.frames[0].save(file_name, format="GIF",append_images=self.frames[1:],save_all=True,loop = 0)
+        self.frames[0].save(file_name, format="GIF",append_images=self.frames[1:],save_all=True,loop = 0, duration=self.durations)
+    
+    def show(self):
+        if self.img is None:
+            self.img = self._get_image(self.img_reference)
+            
+        self.img.show()
+
+if __name__ == "__main__":
+    with open("test.txt","r") as f:
+        gif = f.readline()
+        gif.show()

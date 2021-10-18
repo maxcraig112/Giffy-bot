@@ -5,10 +5,10 @@ from re import M
 from typing import Dict
 from gif import Gif
 from validators.url import url
-from caption import *
 import discord
 import validators
 from discord.ext import commands
+from jsonClass import *
 
 def run_bot(TOKEN):
 
@@ -16,7 +16,7 @@ def run_bot(TOKEN):
 
     def get_last(message):
         #get the last gif which was posted into the server
-            with open("gifs.json", "r") as f:
+            with open("lastgif.json", "r") as f:
                 dict = json.load(f)
                 try:
                     gif = dict[str(message.guild.id)][str(message.channel.id)]
@@ -32,10 +32,27 @@ def run_bot(TOKEN):
         while os.path.getsize("temp.gif") > 8000000:
             await message.channel.send("Caption too big! resizing!")
             gif = Gif("temp.gif")
-            gif.resize(0.75)
+            gif.resize(0.5)
             gif.save("temp.gif")
         await message.channel.send(file=discord.File("temp.gif"))
         os.remove("temp.gif")
+
+    def gif_is_sent(message):
+        if len(message.attachments) > 0 and os.path.splitext(message.attachments[-1].filename)[-1] == ".gif": # validators.url(message.attachments[-1].url) and 
+            return message.attachments[-1].url
+        if validators.url(message.content) and (message.content[-4:] == ".gif" or "tenor" in message.content):
+            return message.content
+        return None
+
+    def last_gif_json(message, url):
+        f = open("lastgif.json","r")
+        dict = json.load(f)
+        if str(message.guild.id) not in dict: #if json database does not have key for current server
+            dict[str(message.guild.id)] = {}  #add current server to json database
+        #add url to key of channel.id. whether or not it exists, it will be created or placed there
+        dict[str(message.guild.id)][str(message.channel.id)] = url
+        with open("lastgif.json","w") as fw:
+            json.dump(dict, fw, indent=4)
 
     @client.event
     async def on_ready():
@@ -47,6 +64,7 @@ def run_bot(TOKEN):
         try:
             if msg == ".cgif":
                 gif = Gif(get_last(message))
+                gif._get_image(gif.img_reference)
                 if gif.img != None:
                     if gif.is_caption_gif():
                         await message.channel.send("The last gif has a caption")
@@ -59,6 +77,7 @@ def run_bot(TOKEN):
                 await message.channel.send(file=discord.File(f"All gifs/downloaded_gifs/{gif}"))
             if msg == ".givetext":
                 gif = Gif(get_last(message))
+                gif._get_image(gif.img_reference)
                 if gif.img != None:
                     text = gif.text_from_caption()
                     if text != None:
@@ -69,80 +88,78 @@ def run_bot(TOKEN):
                     no_gif_found(message)
             if msg == ".lastgif":
                 gif = get_last(message)
-                if gif.img != None:
+                if gif != "" and gif != None:
                     await message.channel.send(gif)
                 else:
                     no_gif_found(message)
             if msg == ".decaption":
+                await message.channel.send("decaptioning gif! give me a second to work!")
                 gif = Gif(get_last(message))
+                gif._get_image(gif.img_reference)
                 if gif.img != None:
-                    await message.channel.send("decaptioning gif! give me a second to work!")
-                    if gif.is_caption_gif:
+                    if gif.is_caption_gif():
                         gif.decaption()
-                        resize_and_send(gif, message)
+                        await resize_and_send(gif, message)
                     else:
                         await message.channel.send("previous gif does not contain a caption")
                 else:
-                    no_gif_found(message)
+                    await no_gif_found(message)
             if msg.split(" ")[0] == ".caption":
-                gif = Gif(get_last(message))
-                if gif.img != None:
+                text = message.content.split(" ", 1)[1]
+                if text != "":
                     await message.channel.send("captioning gif! give me a second to work!")
-                    text = message.content.split(" ", 1)[1]
-                    if text != "":
+                    gif = Gif(get_last(message))
+                    gif._get_image(gif.img_reference)
+                    if gif.img != None:
                         gif.caption(text)
-                        resize_and_send(gif, message)
+                        await resize_and_send(gif, message)
                     else:
-                        await message.channel.send("Please provide a caption!")
+                        no_gif_found(message)
                 else:
-                    no_gif_found(message)
+                    await message.channel.send("Please provide a caption!")
             if msg.split(" ")[0] == ".recaption":
-                gif = Gif(get_last(message))
-                if gif.img != None:
-                    msg = message.content.split(" ", 1)[1]
-                    if msg != "":
-                        await message.channel.send("recaptioning gif! give me a second to work!")
+                text = message.content.split(" ", 1)[1]
+                if text != "":
+                    await message.channel.send("recaptioning gif! give me a second to work!")
+                    gif = Gif(get_last(message))
+                    gif._get_image(gif.img_reference)
+                    if gif.img != None:
                         gif.decaption()
                         gif.caption(text)
-                        resize_and_send(gif, message)
+                        await resize_and_send(gif, message)
                     else:
-                        await message.channel.send("Please provide a caption!")
-
-                else:
-                    no_gif_found(message)
+                        no_gif_found(message)
             if msg == ".speed":
                 gif = Gif(get_last(message))
+                gif._get_image(gif.img_reference)
                 if gif.img != None:
                     await message.channel.send("speeding up gif!")
                     gif.change_speed()
-                    resize_and_send(gif, message)
+                    await resize_and_send(gif, message)
                 else:
                     no_gif_found(message)
-            if len(message.attachments) > 0:
-                # if message.attachments[-1][-4:] == ".gif" or "tenor" in message.content:
-                x = message.attachments[-1].url
-                if validators.url(x):
-                    #if the user has send an attachment, the last attachment send will be added to json
-                    f = open("gifs.json", "r")
-                    dict = json.load(f)
-                    if str(message.guild.id) not in dict: #if json database does not have key for current server
-                        dict[str(message.guild.id)] = {}  #add current server to json database
-                    #add url to key of channel.id. whether or not it exists, it will be created or placed there
-                    dict[str(message.guild.id)][str(message.channel.id)] = str(message.attachments[-1])
-                    f.close()
-                    with open("gifs.json","w") as fw:
-                        json.dump(dict, fw, indent=4)
-            if validators.url(message.content):
-                if message.content[-4:] == ".gif" or "tenor" in message.content:
-                    f = open("gifs.json", "r")
-                    dict = json.load(f)
-                    if str(message.guild.id) not in dict: #if json database does not have key for current server
-                        dict[str(message.guild.id)] = {}  #add current server to json database
-                        #add url to key of channel.id. whether or not it exists, it will be created or placed there
-                    dict[str(message.guild.id)][str(message.channel.id)] = message.content
-                    f.close()
-                    with open("gifs.json","w") as fw:
-                        json.dump(dict, fw, indent=4)
+            if gif_is_sent(message) != None:
+                #update the last gif sent in the guild and channel in the JSON file
+                last_gif_json(message, gif_is_sent(message))
+                #instantiate gif object
+                url = gif_is_sent(message)
+                gif = Gif(url)
+                #instantiate json archiving object, file open depends on whether gif contains a caption
+                archives = JsonGifs("archivedcaptiongifs.json" if gif.is_caption_gif() else "archivedgifs.json","global")
+                #add url to global key
+                archives.add(url)
+                #set catagory to guild key
+                archives.set_catagory("guild")
+                #if server ID not in guild key, add, then add url to server ID
+                if not archives.contains(str(message.guild.id)):
+                    archives.add(str(message.guild.id),data={})
+                archives.add(url,subkey=str(message.guild.id))
+                #set catagory to user key
+                archives.set_catagory("user")
+                if not archives.contains(str(message.author.id)):
+                    archives.add(str(message.author.id),data={})
+                archives.add(url,subkey=str(message.author.id))
+                archives.dump_json()
         except Exception as e:
             await message.channel.send(f"{e}, Oops! Something went wrong!")
     
