@@ -111,7 +111,9 @@ class Tagger:
         self.tags = self._process_caption()
 
     def _process_caption(self):
-        tokens = word_tokenize(self.caption)
+        text = self.caption.encode("ascii","ignore")
+        text = text.decode()
+        tokens = word_tokenize(text)
         alltags = nltk.pos_tag(tokens)
         stop_words = set(stopwords.words("english"))
         #print(alltags)
@@ -134,7 +136,7 @@ class Tagger:
 
 
 if __name__ == "__main__":
-   tag = Tagger("Releasing my 9 trillion trained fire ants on the homeless man who was blinking my coordinates in binary to my gangstalkers")
+   tag = Tagger("Releasing my 9 (sex ‘antoni is gay‘)trillion trained fire ants on the homeless man who was blinking my coordinates in binary to my gangstalkers")
     # captiongifs = JsonCaptionGifs("test.json")
     # captiongifs.set_catagory("global")
     # print(captiongifs.subdict)

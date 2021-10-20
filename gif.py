@@ -77,6 +77,7 @@ class Gif:
         Takes as input a PIL Image Object and returns a list of all frames contained
         within the Image. If Image Object is not GIF, len(frames) == 1
         """
+        self._get_image(self.img)
         frames = []
         for i in range(0,self.img.n_frames):
             self.img.seek(i)

@@ -1,7 +1,7 @@
 import json
 import os
 import random
-from re import M
+from re import M, search
 from typing import Dict
 from gif import Gif
 from validators.url import url
@@ -64,6 +64,8 @@ def run_bot(TOKEN):
         try:
             # if msg == "vore":
             #     await message.channel.send("<@217233850101661697>referenced the forbidden word 'vore', breaking a streak of 0 hour, 0 minutes, and 0 seconds. I'll wait 30 minutes and 0 seconds before warning you for this word again." )
+            if msg == ".test":
+                await message.channel.send("hello\nhow\nare\nyou")
             if msg == ".cgif":
                 gif = Gif(get_last(message))
                 gif._get_image(gif.img_reference)
@@ -77,7 +79,7 @@ def run_bot(TOKEN):
             if msg == ".rgif":
                 gif = random.choice(os.listdir("All gifs/downloaded_gifs"))
                 await message.channel.send(file=discord.File(f"All gifs/downloaded_gifs/{gif}"))
-            if msg == ".givetext":
+            if msg == ".text":
                 gif = Gif(get_last(message))
                 gif._get_image(gif.img_reference)
                 if gif.img != None:
@@ -88,12 +90,56 @@ def run_bot(TOKEN):
                         await message.channel.send("no text found")
                 else:
                     no_gif_found(message)
-            if msg == ".lastgif":
+            if msg == ".tags":
+                gif = Gif(get_last(message))
+                gif._get_image(gif.img_reference)
+                if gif.img != None:
+                    text = gif.text_from_caption()
+                    if text != None:
+                        tags = Tagger(text).tags #get tags
+                        await message.channel.send(tags)
+                else:
+                    no_gif_found(message)
+            if msg == ".lgif":
                 gif = get_last(message)
                 if gif != "" and gif != None:
                     await message.channel.send(gif)
                 else:
                     no_gif_found(message)
+            if msg[:7] == ".search":
+                search_terms = msg[8:].replace(" ","").lower().split(",")
+                urls = []
+                scores = []
+
+                tags_json = Json("tags.json")
+                tags_json.key = "tags"
+                tags_json.subdict = tags_json.dict[tags_json.key]
+                
+                #for every search term the user inputted
+                for term in search_terms:
+                    #if search term exists in tags
+                    if tags_json.contains(term):
+                        # yoink every url inside tag, if url has been grabbed before, add to existing score
+                        for url in tags_json.subdict[term]:
+                            #if url already grabbed, increment score by one
+                            if url in urls:
+                                scores[urls.index(url)] += 1
+                            else:
+                                #otherwise, add to list, give score of 1
+                                urls += [url]
+                                scores += [1]
+                #sort urls by score
+                #print(urls,scores)
+                if len(urls) > 0:
+                    urls, scores = zip(*sorted(zip(urls,scores),reverse=True))
+                    #print(urls,scores)
+                    txt = ""
+                    for i in range(min(5,len(urls))):
+                        #print 5 highest scoring gifs
+                        txt += f"{urls[i]}\n"
+                    await message.channel.send(txt[:-1])
+                else:
+                    await message.channel.send("sorry! no caption gifs with those tags can be found!")
             if msg == ".decaption":
                 await message.channel.send("decaptioning gif! give me a second to work!")
                 gif = Gif(get_last(message))
@@ -148,15 +194,26 @@ def run_bot(TOKEN):
                 #instantiate gif object
                 gif = Gif(url.url)
                 gif._get_image(gif.img_reference)
-
+                data = [url.guildID,url.channelID,url.userID]
                 #if gif is a caption gif
                 if gif.is_caption_gif():
                     caption = gif.text_from_caption() #get caption
                     tags = Tagger(caption).tags #get tags
-                    await message.channel.send(tags)
+                    data += [tags]
+                    #await message.channel.send(tags)
+
+                    tags_json = Json("tags.json")
+                    tags_json.key = "tags"
+                    tags_json.subdict = tags_json.dict[tags_json.key] # setting the subdictionary to the dictionary so that this works
+                    # for every tag in url
+                    for tag in tags:
+                        tags_json.addsubKey(tag)
+                        tags_json.add(url.url,data[:-1],tag)
+                    tags_json.dump_json()
+
                 #instantiate json archiving object, file open depends on whether gif contains a caption
                 archives = JsonGifs("archivedcaptiongifs.json" if gif.is_caption_gif() else "archivedgifs.json","global")
-                archives.add(url.url,[url.guildID,url.channelID,url.userID]) #add url to global key
+                archives.add(url.url,data) #add url to global key
                 archives.set_catagory("guild") #set catagory to guild key
                 
                 archives.addsubKey(url.guildID) #if server ID not in guild key, add, then add url to server ID

@@ -18,3 +18,11 @@ Aims of the bot
 
 USE NLTK FOR WORD PROCESSING
 CHECK THAT PIXEL 0,0 OF FIRST AND SECOND FRAME REMAINS CONSTANT
+
+
+TODO:
+- Move json files to folder
+- work out fix for duplicate gifs being archived
+- implement search by user,guild,global, maybe in class?
+- interface for searching gifs and getting result
+- method for taking list of gifs and archiving

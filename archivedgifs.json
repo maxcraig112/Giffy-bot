@@ -1,8 +1,26 @@
 {
     "global": {
+        "https://tenor.com/view/flexing-flex-arnold-arnold-schwarzenegger-body-builder-gif-18454197": [
+            "470896999722516480",
+            "712243005519560736",
+            "217233850101661697"
+        ],
+        "https://media.discordapp.net/attachments/868888972120702999/887964654742175744/caption.gif": [
+            "470896999722516480",
+            "712243005519560736",
+            "217233850101661697"
+        ]
     },
     "guild": {
+        "470896999722516480": {
+            "https://tenor.com/view/flexing-flex-arnold-arnold-schwarzenegger-body-builder-gif-18454197": null,
+            "https://media.discordapp.net/attachments/868888972120702999/887964654742175744/caption.gif": null
+        }
     },
     "user": {
+        "217233850101661697": {
+            "https://tenor.com/view/flexing-flex-arnold-arnold-schwarzenegger-body-builder-gif-18454197": null,
+            "https://media.discordapp.net/attachments/868888972120702999/887964654742175744/caption.gif": null
+        }
     }
 }
