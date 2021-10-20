@@ -8,7 +8,7 @@ from validators.url import url
 import discord
 import validators
 from discord.ext import commands
-from jsonClass import *
+from URLJson import *
 
 def run_bot(TOKEN):
 
@@ -44,13 +44,13 @@ def run_bot(TOKEN):
             return message.content
         return None
 
-    def last_gif_json(message, url):
+    def last_gif_json(url):
         f = open("lastgif.json","r")
         dict = json.load(f)
-        if str(message.guild.id) not in dict: #if json database does not have key for current server
-            dict[str(message.guild.id)] = {}  #add current server to json database
+        if url.guildID not in dict: #if json database does not have key for current server
+            dict[url.guildID] = {}  #add current server to json database
         #add url to key of channel.id. whether or not it exists, it will be created or placed there
-        dict[str(message.guild.id)][str(message.channel.id)] = url
+        dict[url.guildID][url.channelID] = url.url
         with open("lastgif.json","w") as fw:
             json.dump(dict, fw, indent=4)
 
@@ -62,6 +62,8 @@ def run_bot(TOKEN):
     async def on_message(message):
         msg = message.content.lower()
         try:
+            # if msg == "vore":
+            #     await message.channel.send("<@217233850101661697>referenced the forbidden word 'vore', breaking a streak of 0 hour, 0 minutes, and 0 seconds. I'll wait 30 minutes and 0 seconds before warning you for this word again." )
             if msg == ".cgif":
                 gif = Gif(get_last(message))
                 gif._get_image(gif.img_reference)
@@ -139,27 +141,32 @@ def run_bot(TOKEN):
                 else:
                     no_gif_found(message)
             if gif_is_sent(message) != None:
+                #create URLAttachment Object containing url location data
+                url = AttachmentURL(gif_is_sent(message),message.guild.id,message.channel.id,message.author.id)
                 #update the last gif sent in the guild and channel in the JSON file
-                last_gif_json(message, gif_is_sent(message))
+                last_gif_json(url)
                 #instantiate gif object
-                url = gif_is_sent(message)
-                gif = Gif(url)
+                gif = Gif(url.url)
+                gif._get_image(gif.img_reference)
+
+                #if gif is a caption gif
+                if gif.is_caption_gif():
+                    caption = gif.text_from_caption() #get caption
+                    tags = Tagger(caption).tags #get tags
+                    await message.channel.send(tags)
                 #instantiate json archiving object, file open depends on whether gif contains a caption
                 archives = JsonGifs("archivedcaptiongifs.json" if gif.is_caption_gif() else "archivedgifs.json","global")
-                #add url to global key
-                archives.add(url)
-                #set catagory to guild key
-                archives.set_catagory("guild")
-                #if server ID not in guild key, add, then add url to server ID
-                if not archives.contains(str(message.guild.id)):
-                    archives.add(str(message.guild.id),data={})
-                archives.add(url,subkey=str(message.guild.id))
-                #set catagory to user key
-                archives.set_catagory("user")
-                if not archives.contains(str(message.author.id)):
-                    archives.add(str(message.author.id),data={})
-                archives.add(url,subkey=str(message.author.id))
-                archives.dump_json()
+                archives.add(url.url,[url.guildID,url.channelID,url.userID]) #add url to global key
+                archives.set_catagory("guild") #set catagory to guild key
+                
+                archives.addsubKey(url.guildID) #if server ID not in guild key, add, then add url to server ID
+                archives.add(url.url,None,url.guildID)
+                
+                archives.set_catagory("user") #if user ID not in user key, add, then add url to user ID
+                archives.addsubKey(url.userID)
+                archives.add(url.url,None,url.userID)
+
+                archives.dump_json() #save json file
         except Exception as e:
             await message.channel.send(f"{e}, Oops! Something went wrong!")
     

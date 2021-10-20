@@ -1,83 +1,8 @@
 {
     "global": {
-        "https://media.discordapp.net/attachments/841208671169675354/897026153183866890/temp.gif": null,
-        "https://tenor.com/view/jacc-jacc-so-cool-scared-black-kid-black-gif-19028879": null,
-        "https://tenor.com/view/dwayne-johnson-the-rock-dwayne-johnson-talking-gif-22841231": null,
-        "https://tenor.com/view/bruh-really-tell-me-more-no-way-wth-gif-21239271": null,
-        "https://media.discordapp.net/attachments/841208671169675354/899227139155558400/caption.gif": null,
-        "https://media.discordapp.net/attachments/869864347449577512/894129511157878814/bruhmoment.gif": null,
-        "https://cdn.discordapp.com/attachments/869864347449577512/899611465697333278/temp.gif": null,
-        "https://tenor.com/view/cat-kitty-cope-gif-20110606": null,
-        "https://media.discordapp.net/attachments/712243005519560736/899248394718044170/temp.gif": null,
-        "https://cdn.discordapp.com/attachments/712243005519560736/899614434845163540/temp.gif": null,
-        "https://media.discordapp.net/attachments/841208671169675354/897025959889346611/temp.gif": null,
-        "https://cdn.discordapp.com/attachments/869864347449577512/899617605055311962/temp.gif": null,
-        "https://cdn.discordapp.com/attachments/869864347449577512/899617623615107102/temp.gif": null,
-        "https://cdn.discordapp.com/attachments/869864347449577512/899617714333712475/temp.gif": null,
-        "https://cdn.discordapp.com/attachments/869864347449577512/899617729080868904/temp.gif": null,
-        "https://tenor.com/view/old-man-computer-not-working-broken-come-on-gif-16861225": null,
-        "https://cdn.discordapp.com/attachments/869864347449577512/899618437347827722/temp.gif": null,
-        "https://tenor.com/view/gigachad-chad-gif-20773266": null,
-        "https://cdn.discordapp.com/attachments/869367960186282024/899625327955939358/temp.gif": null,
-        "https://tenor.com/view/croatia-za-dom-spremni-gif-21516735": null
     },
     "guild": {
-        "470896999722516480": {
-            "https://media.discordapp.net/attachments/841208671169675354/897026153183866890/temp.gif": null,
-            "https://tenor.com/view/jacc-jacc-so-cool-scared-black-kid-black-gif-19028879": null,
-            "https://media.discordapp.net/attachments/841208671169675354/899227139155558400/caption.gif": null,
-            "https://media.discordapp.net/attachments/712243005519560736/899248394718044170/temp.gif": null,
-            "https://cdn.discordapp.com/attachments/712243005519560736/899614434845163540/temp.gif": null,
-            "https://media.discordapp.net/attachments/841208671169675354/897025959889346611/temp.gif": null,
-            "https://tenor.com/view/croatia-za-dom-spremni-gif-21516735": null
-        },
-        "741169124817764372": {
-            "https://tenor.com/view/dwayne-johnson-the-rock-dwayne-johnson-talking-gif-22841231": null,
-            "https://tenor.com/view/bruh-really-tell-me-more-no-way-wth-gif-21239271": null,
-            "https://media.discordapp.net/attachments/841208671169675354/899227139155558400/caption.gif": null,
-            "https://media.discordapp.net/attachments/869864347449577512/894129511157878814/bruhmoment.gif": null,
-            "https://cdn.discordapp.com/attachments/869864347449577512/899611465697333278/temp.gif": null,
-            "https://tenor.com/view/cat-kitty-cope-gif-20110606": null,
-            "https://cdn.discordapp.com/attachments/869864347449577512/899617605055311962/temp.gif": null,
-            "https://cdn.discordapp.com/attachments/869864347449577512/899617623615107102/temp.gif": null,
-            "https://cdn.discordapp.com/attachments/869864347449577512/899617714333712475/temp.gif": null,
-            "https://cdn.discordapp.com/attachments/869864347449577512/899617729080868904/temp.gif": null,
-            "https://tenor.com/view/old-man-computer-not-working-broken-come-on-gif-16861225": null,
-            "https://cdn.discordapp.com/attachments/869864347449577512/899618437347827722/temp.gif": null
-        },
-        "868888972120702996": {
-            "https://tenor.com/view/gigachad-chad-gif-20773266": null,
-            "https://cdn.discordapp.com/attachments/869367960186282024/899625327955939358/temp.gif": null,
-            "https://tenor.com/view/croatia-za-dom-spremni-gif-21516735": null
-        }
     },
     "user": {
-        "217233850101661697": {
-            "https://media.discordapp.net/attachments/841208671169675354/897026153183866890/temp.gif": null,
-            "https://tenor.com/view/jacc-jacc-so-cool-scared-black-kid-black-gif-19028879": null,
-            "https://tenor.com/view/dwayne-johnson-the-rock-dwayne-johnson-talking-gif-22841231": null,
-            "https://media.discordapp.net/attachments/841208671169675354/899227139155558400/caption.gif": null,
-            "https://tenor.com/view/cat-kitty-cope-gif-20110606": null,
-            "https://media.discordapp.net/attachments/712243005519560736/899248394718044170/temp.gif": null,
-            "https://media.discordapp.net/attachments/841208671169675354/897025959889346611/temp.gif": null,
-            "https://tenor.com/view/old-man-computer-not-working-broken-come-on-gif-16861225": null,
-            "https://tenor.com/view/gigachad-chad-gif-20773266": null,
-            "https://tenor.com/view/croatia-za-dom-spremni-gif-21516735": null
-        },
-        "379440775206797385": {
-            "https://tenor.com/view/bruh-really-tell-me-more-no-way-wth-gif-21239271": null,
-            "https://media.discordapp.net/attachments/869864347449577512/894129511157878814/bruhmoment.gif": null
-        },
-        "893293074413916230": {
-            "https://cdn.discordapp.com/attachments/869864347449577512/899611465697333278/temp.gif": null,
-            "https://cdn.discordapp.com/attachments/712243005519560736/899614434845163540/temp.gif": null,
-            "https://cdn.discordapp.com/attachments/869864347449577512/899617605055311962/temp.gif": null,
-            "https://cdn.discordapp.com/attachments/869864347449577512/899617623615107102/temp.gif": null,
-            "https://cdn.discordapp.com/attachments/869864347449577512/899617714333712475/temp.gif": null,
-            "https://cdn.discordapp.com/attachments/869864347449577512/899617729080868904/temp.gif": null,
-            "https://cdn.discordapp.com/attachments/869864347449577512/899618437347827722/temp.gif": null,
-            "https://media.discordapp.net/attachments/841208671169675354/899227139155558400/caption.gif": null,
-            "https://cdn.discordapp.com/attachments/869367960186282024/899625327955939358/temp.gif": null
-        }
     }
 }

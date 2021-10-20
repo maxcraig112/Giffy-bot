@@ -28,7 +28,6 @@ class Gif:
         self.width = None
         self.height = None
 
-
     def _get_image(self,img):
         """
         Takes any expected form of image path and converts it into PIL Image Object

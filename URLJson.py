@@ -4,7 +4,7 @@ from io import BytesIO, StringIO
 import os
 import validators
 import uuid
-from typing import Text
+from typing import Text, final
 import requests
 import urllib.request
 from shutil import *
@@ -13,6 +13,16 @@ import numpy as np
 from pytesseract import *
 from gif import Gif
 from enum import Enum
+from nltk.tokenize import word_tokenize
+import nltk
+from nltk.corpus import stopwords
+
+class AttachmentURL:
+    def __init__(self, url, guildID = None, channelID = None, userID = None) -> None:
+        self.url = url
+        self.guildID = str(guildID)
+        self.channelID = str(channelID)
+        self.userID = str(userID)
 
 class URLCatagories(Enum):
     Global = "global"
@@ -47,6 +57,17 @@ class Json:
             return item in self.subdict
         return item in self.subdict[subkey]
     
+    def addsubKey(self,keyName):
+        """
+        Creates a new subkey inside the subdictionary
+        Useful for adding guild ID's to guild or user ID's to user
+
+        if subKey already exists, return None
+        """
+        if self.contains(keyName):
+            return None
+        self.add(keyName,{})
+
     def add(self, item, data = None, subkey = None):
         if self.subdict != None:
             if subkey == None:
@@ -84,8 +105,36 @@ class JsonGifs(Json):
         except ValueError:
             return None
     
+class Tagger:
+    def __init__(self, caption) -> None:
+        self.caption = caption
+        self.tags = self._process_caption()
+
+    def _process_caption(self):
+        tokens = word_tokenize(self.caption)
+        alltags = nltk.pos_tag(tokens)
+        stop_words = set(stopwords.words("english"))
+        #print(alltags)
+        sub_tags = []
+        #remove all tags that are stop_words
+        for i in alltags:
+            if i[0].lower() not in stop_words:
+                sub_tags += [i]
+        #print(sub_tags)
+        
+
+        final_tags = []
+        #remove all tags that aren't nouns, adjectives, verbs, and add only lowercase words to final_tags
+        for i in sub_tags:
+            if i[1][0] in ["J","N","V"] and i[0].lower() not in final_tags:
+                final_tags += [i[0].lower()]
+        #print(final_tags)
+        return final_tags
+        
+
+
 if __name__ == "__main__":
-   pass
+   tag = Tagger("Releasing my 9 trillion trained fire ants on the homeless man who was blinking my coordinates in binary to my gangstalkers")
     # captiongifs = JsonCaptionGifs("test.json")
     # captiongifs.set_catagory("global")
     # print(captiongifs.subdict)
