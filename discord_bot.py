@@ -77,8 +77,27 @@ def run_bot(TOKEN):
                 else:
                     no_gif_found(message)
             if msg == ".rgif":
-                gif = random.choice(os.listdir("All gifs/downloaded_gifs"))
-                await message.channel.send(file=discord.File(f"All gifs/downloaded_gifs/{gif}"))
+                # open archived gifs, get random url from global
+                archive = JsonGifs("Json/archivedgifs.json","global")
+                count = 0
+                maxx = random.randrange(0,len(archive))
+                for i in archive.subdict:
+                    if count == maxx:
+                        await message.channel.send(i)
+                        break
+                    count += 1
+                # gif = random.choice(os.listdir("All gifs/downloaded_gifs"))
+                # await message.channel.send(file=discord.File(f"All gifs/downloaded_gifs/{gif}"))
+            if msg == ".rcgif":
+                # open archived gifs, get random url from global
+                archive = JsonGifs("Json/archivedcaptiongifs.json","global")
+                count = 0
+                maxx = random.randrange(0,len(archive))
+                for i in archive.subdict:
+                    if count == maxx:
+                        await message.channel.send(i)
+                        break
+                    count += 1
             if msg == ".text":
                 gif = Gif(get_last(message))
                 gif._get_image(gif.img_reference)
@@ -110,6 +129,7 @@ def run_bot(TOKEN):
                 search_terms = msg[8:].replace(" ","").lower().split(",")
                 urls = []
                 scores = []
+                max_tags = []
 
                 tags_json = JsonGifs("Json/tags.json","global")
                 size = len(tags_json.subdict)
@@ -122,21 +142,28 @@ def run_bot(TOKEN):
                         for url in tags_json.subdict[term]:
                             #if url already grabbed, increment score by one
                             if url in urls:
-                                scores[urls.index(url)] += 1
+                                scores[urls.index(url)] += (scores[urls.index(url)]+1)**2 
                             else:
                                 #otherwise, add to list, give score of 1
                                 urls += [url]
                                 scores += [1]
+                                caption_json = JsonGifs("Json/archivedcaptiongifs.json","global")
+                                max_tags += [len(caption_json.subdict[url][-1])]
                 #sort urls by score
                 #print(urls,scores)
+                for i in range(len(scores)):
+                    scores[i] = scores[i]/max_tags[i]
                 if len(urls) > 0:
-                    urls, scores = zip(*sorted(zip(urls,scores),reverse=True))
+                    scores, urls = zip(*sorted(zip(scores,urls),reverse=True))
                     #print(urls,scores)
-                    txt = f"It took {int(timeit.default_timer() - start_time)} seconds to search through {size} tags, here are the top f{min(len(urls),5)} i found! "
+                    txt = f"It took {int(timeit.default_timer() - start_time)} seconds to search through {size} tags, here are the top {min(len(urls),5)} i found! "
                     for i in range(min(5,len(urls))):
                         #print 5 highest scoring gifs
                         txt += f"{urls[i]}\n"
+                    print(scores[:5])
                     await message.channel.send(txt[:-1])
+                    u = AttachmentURL(urls[-1],message.guild.id,message.channel.id,message.author.id)
+                    last_gif_json(u)
                 else:
                     await message.channel.send("sorry! no caption gifs with those tags can be found!")
             if msg == ".decaption":
@@ -244,16 +271,16 @@ def run_bot(TOKEN):
     client.run(TOKEN)
 if __name__ == "__main__":
     # gifs = []
-    # with open("cleangifs.txt","r") as f:
+    # with open("taine_gifs.txt","r") as f:
     #     gifs = f.readlines()
     # guildID = "470896999722516480"
     # channelID = "712243005519560736"
-    # userID = "217233850101661697"
+    # userID = "158878635766317056"
 
     # failed_gifs = []
-    # for i in range(39,len(gifs)):
+    # for i in range(1063,len(gifs)):
     #     try:
-    #         print(i)
+    #         print(f"{i}/{len(gifs)}")
     #         url = AttachmentURL(gifs[i].strip(),guildID,channelID,userID)
     #         #instantiate gif object
     #         gif = Gif(url.url)

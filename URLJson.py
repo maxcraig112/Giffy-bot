@@ -100,6 +100,9 @@ class Json:
     def _update_dict(self):
         if self.key != None:
             self.dict[self.key] = self.subdict
+    
+    def __len__(self):
+        return len(self.subdict)
 
 class JsonGifs(Json):
 
