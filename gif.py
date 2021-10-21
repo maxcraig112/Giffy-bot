@@ -56,11 +56,12 @@ class Gif:
                 #otherwise img is a directory path
                 img = Image.open(img)
         except:
-            pass
+            return False
         self.img = img
         self.frames = self._get_frames()
         self.durations = self._get_duration()
         self._update_size()
+        return True
 
     def _get_file_name(self, file_name: str, path: str):
         res = ""

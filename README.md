@@ -37,5 +37,5 @@ TODO:
 - implement search by user,guild,global, maybe in class?
     - might require reformatting of tags.json into subtags global,guild,user (DONE)
 - interface for searching gifs and getting result
-- method for taking list of gifs and archiving
+- method for taking list of gifs and archiving (DONE)
 - method for downloading all archived gifs, reprocesssing them
