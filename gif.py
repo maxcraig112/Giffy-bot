@@ -289,6 +289,4 @@ class Gif:
         self.img.show()
 
 if __name__ == "__main__":
-    with open("test.txt","r") as f:
-        gif = f.readline()
-        gif.show()
+    pass

@@ -1,7 +1,7 @@
 # Giffy-Bot
-A mutlipurpose repos designed to allow the de-captioning and tagging of gifs, as well as other functionality to do with the catagorising and organising of gifs.
+A mutlipurpose repos designed to allow the de-captioning and tagging of gifs, as well as other functionality to do with the catagorising, archiving and searching of gifs.
 
-The repos also provides abstraction of these commands through the discord bot Giffy
+The repos provides abstraction of these commands through the discord bot Giffy
 
 
 Current list of Bot Commands
@@ -9,6 +9,16 @@ Current list of Bot Commands
 - return text in a gif
 - store last gif posted to server
 - create caption gifs
+- store all unique gifs sent 
+    - Globally
+    - in each guild
+    - by each user
+- Tags all caption gifs according to the
+    - Nouns
+    - Adjectives
+    - Verbs
+- contained within their caption
+- Allows the searching of gifs through these tags
 
 Aims of the bot
 - Scraping caption gifs off tenor using API
@@ -21,8 +31,11 @@ CHECK THAT PIXEL 0,0 OF FIRST AND SECOND FRAME REMAINS CONSTANT
 
 
 TODO:
-- Move json files to folder
-- work out fix for duplicate gifs being archived
+- fix problems where it thinks certain white caption gifs are gifs
+- Move json files to folder (DONE)
+- work out fix for duplicate gifs being archived (DONE)
 - implement search by user,guild,global, maybe in class?
+    - might require reformatting of tags.json into subtags global,guild,user (DONE)
 - interface for searching gifs and getting result
 - method for taking list of gifs and archiving
+- method for downloading all archived gifs, reprocesssing them

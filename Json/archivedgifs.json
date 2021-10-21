@@ -1,0 +1,42 @@
+{
+    "global": {
+        "https://tenor.com/view/pepe-laugh-he-doesnt-know-pepe-gif-14019260": [
+            "470896999722516480",
+            "712243005519560736",
+            "217233850101661697"
+        ],
+        "https://cdn.discordapp.com/attachments/712243005519560736/900601530313506816/temp.gif": [
+            "470896999722516480",
+            "712243005519560736",
+            "893293074413916230"
+        ],
+        "https://media.discordapp.net/attachments/841208671169675354/897026153183866890/temp.gif": [
+            "470896999722516480",
+            "712243005519560736",
+            "217233850101661697"
+        ],
+        "https://media.discordapp.net/attachments/868888972120702999/887964654742175744/caption.gif": [
+            "470896999722516480",
+            "712243005519560736",
+            "217233850101661697"
+        ]
+    },
+    "guild": {
+        "470896999722516480": {
+            "https://tenor.com/view/pepe-laugh-he-doesnt-know-pepe-gif-14019260": null,
+            "https://cdn.discordapp.com/attachments/712243005519560736/900601530313506816/temp.gif": null,
+            "https://media.discordapp.net/attachments/841208671169675354/897026153183866890/temp.gif": null,
+            "https://media.discordapp.net/attachments/868888972120702999/887964654742175744/caption.gif": null
+        }
+    },
+    "user": {
+        "217233850101661697": {
+            "https://tenor.com/view/pepe-laugh-he-doesnt-know-pepe-gif-14019260": null,
+            "https://media.discordapp.net/attachments/841208671169675354/897026153183866890/temp.gif": null,
+            "https://media.discordapp.net/attachments/868888972120702999/887964654742175744/caption.gif": null
+        },
+        "893293074413916230": {
+            "https://cdn.discordapp.com/attachments/712243005519560736/900601530313506816/temp.gif": null
+        }
+    }
+}

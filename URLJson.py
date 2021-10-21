@@ -1,4 +1,5 @@
 import json
+from re import sub
 from bs4 import *
 from io import BytesIO, StringIO
 import os
@@ -52,10 +53,12 @@ class Json:
         with open(self.file_name,"w") as fw:
             json.dump(self.dict, fw, indent=4)
     
-    def contains(self, item, subkey= None):
+    def contains(self, item, subkey= None, subsubkey= None):
         if subkey == None:
             return item in self.subdict
-        return item in self.subdict[subkey]
+        if subsubkey == None:
+            return item in self.subdict[subkey]
+        return item in self.subdict[subkey][subsubkey]
     
     def addsubKey(self,keyName):
         """
@@ -67,15 +70,28 @@ class Json:
         if self.contains(keyName):
             return None
         self.add(keyName,{})
+    
+    def addsubsubKey(self,subKey,subsubKey):
+        """
+        Creates a new subsubkey inside the dictionary
+        useful for adding new tags
+        """
+        if self.contains(subsubKey,subKey):
+            return None
+        self.add(subsubKey,{},subKey)
 
-    def add(self, item, data = None, subkey = None):
+    def add(self, item, data = None, subkey = None,subsubkey=None):
         if self.subdict != None:
             if subkey == None:
                 if not self.contains(item):
                     self.subdict[item] = data
             else:
-                if not self.contains(item,subkey):
-                    self.subdict[subkey][item] = data
+                if subsubkey == None:
+                    if not self.contains(item,subkey):
+                        self.subdict[subkey][item] = data
+                else:
+                    if not self.contains(item,subkey,subsubkey):
+                        self.subdict[subkey][subsubkey][item] = data
     
     def set_file_name(self, new_file_name):
         if new_file_name[-5:].lower() == ".json":
@@ -104,6 +120,16 @@ class JsonGifs(Json):
             return catagory.lower()
         except ValueError:
             return None
+    
+    def contains_alt_url(self, url, subkey=None,subsubkey=None):
+        contains = False
+        if len(url.url) > 39 and url.url[:39] == "https://cdn.discordapp.com/attachments/":
+            if self.contains("https://media.discordapp.net/attachments/"+url.url[39:],subkey=subkey,subsubkey=subsubkey):
+                    contains = True
+        if len(url.url) > 41 and url.url[:41] == "https://media.discordapp.net/attachments/":
+            if self.contains("https://cdn.discordapp.com/attachments/"+url.url[:41],subkey=subkey,subsubkey=subsubkey):
+                    contains = True
+        return contains
     
 class Tagger:
     def __init__(self, caption) -> None:
