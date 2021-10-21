@@ -160,9 +160,9 @@ def run_bot(TOKEN):
                     for i in range(min(5,len(urls))):
                         #print 5 highest scoring gifs
                         txt += f"{urls[i]}\n"
-                    print(scores[:5])
+                    #print(scores[:5])
                     await message.channel.send(txt[:-1])
-                    u = AttachmentURL(urls[-1],message.guild.id,message.channel.id,message.author.id)
+                    u = AttachmentURL(urls[min(len(urls)-1,4)],message.guild.id,message.channel.id,message.author.id)
                     last_gif_json(u)
                 else:
                     await message.channel.send("sorry! no caption gifs with those tags can be found!")

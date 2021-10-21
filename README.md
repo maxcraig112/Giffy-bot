@@ -39,3 +39,5 @@ TODO:
 - interface for searching gifs and getting result
 - method for taking list of gifs and archiving (DONE)
 - method for downloading all archived gifs, reprocesssing them
+- maybe make it so the order of search terms searched influences the score?
+- search terms are sliced and those tags are searched too? (but with a reduced score)
