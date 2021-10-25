@@ -13,6 +13,7 @@ from pytesseract import *
 
 #from caption import get_top_caption
 pytesseract.tesseract_cmd = 'C:/Users/maxcr/Desktop/Executables/Tesseract/tesseract.exe'
+#pytesseract.tesseract_cmd = '/home/pi/Desktop/Tesseract/tesseract.exe'
 
 #Search from all gifs
 #Search from gif in server
