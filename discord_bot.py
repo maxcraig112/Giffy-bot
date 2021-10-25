@@ -127,6 +127,9 @@ def run_bot(TOKEN):
                     no_gif_found(message)
             if msg[:7] == ".search":
                 search_terms = msg[8:].replace(" ","").lower().split(",")
+                for i in range(len(search_terms)):
+                    if search_terms[i][-1] != "s":
+                        search_terms += [search_terms[i] + "s"]
                 urls = []
                 scores = []
                 max_tags = []
@@ -136,19 +139,21 @@ def run_bot(TOKEN):
                 start_time = timeit.default_timer()
                 #for every search term the user inputted
                 for term in search_terms:
-                    #if search term exists in tags
-                    if tags_json.contains(term):
-                        # yoink every url inside tag, if url has been grabbed before, add to existing score
-                        for url in tags_json.subdict[term]:
-                            #if url already grabbed, increment score by one
-                            if url in urls:
-                                scores[urls.index(url)] += (scores[urls.index(url)]+1)**2 
-                            else:
-                                #otherwise, add to list, give score of 1
-                                urls += [url]
-                                scores += [1]
-                                caption_json = JsonGifs("Json/archivedcaptiongifs.json","global")
-                                max_tags += [len(caption_json.subdict[url][-1])]
+                    #for every single slice of that search term
+                    for i in range(len(term) + 1):
+                        #if search term exists in tags
+                        if tags_json.contains(term):
+                            # yoink every url inside tag, if url has been grabbed before, add to existing score
+                            for url in tags_json.subdict[term]:
+                                #if url already grabbed, increment score by one
+                                if url in urls:
+                                    scores[urls.index(url)] += (scores[urls.index(url)]+1)**2 
+                                else:
+                                    #otherwise, add to list, give score of 1
+                                    urls += [url]
+                                    scores += [i/len(term)]
+                                    caption_json = JsonGifs("Json/archivedcaptiongifs.json","global")
+                                    max_tags += [len(caption_json.subdict[url][-1])]
                 #sort urls by score
                 #print(urls,scores)
                 for i in range(len(scores)):
@@ -156,8 +161,8 @@ def run_bot(TOKEN):
                 if len(urls) > 0:
                     scores, urls = zip(*sorted(zip(scores,urls),reverse=True))
                     #print(urls,scores)
-                    txt = f"It took {int(timeit.default_timer() - start_time)} seconds to search through {size} tags, here are the top {min(len(urls),5)} i found! "
-                    for i in range(min(5,len(urls))):
+                    txt = f"It took {int(timeit.default_timer() - start_time)} seconds to search through {size} tags with {sum([len(search_terms[i]) for i in range(len(search_terms))])} alternate search terms, out of {len(urls)} results, here are the top {min(len(urls),5)} i found! "
+                    for i in range(min(3,len(urls))):
                         #print 5 highest scoring gifs
                         txt += f"{urls[i]}\n"
                     #print(scores[:5])

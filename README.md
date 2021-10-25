@@ -38,6 +38,7 @@ TODO:
     - might require reformatting of tags.json into subtags global,guild,user (DONE)
 - interface for searching gifs and getting result
 - method for taking list of gifs and archiving (DONE)
+- create actual method for taking list of gifs
 - method for downloading all archived gifs, reprocesssing them
 - maybe make it so the order of search terms searched influences the score?
-- search terms are sliced and those tags are searched too? (but with a reduced score)
+- reprocess all gifs so that full text is included too

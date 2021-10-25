@@ -5439,6 +5439,51 @@
             "470896999722516480",
             "712243005519560736",
             "158878635766317056"
+        ],
+        "https://tenor.com/view/gamestop-gif-9877337": [
+            "553451524131389452",
+            "553451524576247811",
+            "217233850101661697"
+        ],
+        "https://tenor.com/view/copy-that-eb-games-wtf-gif-3876164": [
+            "553451524131389452",
+            "553451524576247811",
+            "217233850101661697"
+        ],
+        "https://tenor.com/view/xqc-gif-22748016": [
+            "470896999722516480",
+            "712243005519560736",
+            "217233850101661697"
+        ],
+        "https://tenor.com/view/typing-petty-fast-cloudy-with-a-chance-of-meatballs-flint-lockwood-gif-4907824": [
+            "741169124817764372",
+            "841208671169675354",
+            "379440775206797385"
+        ],
+        "https://cdn.discordapp.com/attachments/841208671169675354/901740944838258699/temp.gif": [
+            "741169124817764372",
+            "841208671169675354",
+            "893293074413916230"
+        ],
+        "https://media.discordapp.net/attachments/707457666795962398/897933540266745906/850879268194877471.gif": [
+            "741169124817764372",
+            "841208671169675354",
+            "449959767834755123"
+        ],
+        "https://tenor.com/view/gollum-lord-of-the-rings-addicted-precious-gif-12703641": [
+            "470896999722516480",
+            "712243005519560736",
+            "217233850101661697"
+        ],
+        "https://tenor.com/view/seulyien-got7-yugyeom-got7yugyeom-staring-at-screen-gif-21985764": [
+            "741169124817764372",
+            "841208671169675354",
+            "217233850101661697"
+        ],
+        "https://tenor.com/view/seulyien-got7-got7yugyeom-yugyeom-blinking-gif-21985600": [
+            "741169124817764372",
+            "841208671169675354",
+            "217233850101661697"
         ]
     },
     "guild": {
@@ -6530,7 +6575,25 @@
             "https://media.discordapp.net/attachments/499373423378563083/603205712033611776/godfordiscord.gif": null,
             "https://cdn.discordapp.com/attachments/212597110770630656/592243363881680897/ned_bottom.gif": null,
             "https://cdn.discordapp.com/attachments/212597110770630656/592239844835459073/ned_top.gif": null,
-            "https://cdn.discordapp.com/attachments/266688738883665920/603864799104729149/image4.gif": null
+            "https://cdn.discordapp.com/attachments/266688738883665920/603864799104729149/image4.gif": null,
+            "https://tenor.com/view/xqc-gif-22748016": null,
+            "https://tenor.com/view/gollum-lord-of-the-rings-addicted-precious-gif-12703641": null
+        },
+        "868888972120702996": {
+            "https://tenor.com/view/jacc-jacc-so-cool-scared-black-kid-black-gif-19028879": null
+        },
+        "553451524131389452": {
+            "https://tenor.com/view/gamestop-gif-9877337": null,
+            "https://tenor.com/view/copy-that-eb-games-wtf-gif-3876164": null
+        },
+        "741169124817764372": {
+            "https://tenor.com/view/typing-petty-fast-cloudy-with-a-chance-of-meatballs-flint-lockwood-gif-4907824": null,
+            "https://tenor.com/view/christian-bale-american-psycho-walk-jam-gif-16732505": null,
+            "https://tenor.com/view/astrella-typing-fast-astrella-typing-keyboard-gif-17348175": null,
+            "https://cdn.discordapp.com/attachments/841208671169675354/901740944838258699/temp.gif": null,
+            "https://media.discordapp.net/attachments/707457666795962398/897933540266745906/850879268194877471.gif": null,
+            "https://tenor.com/view/seulyien-got7-yugyeom-got7yugyeom-staring-at-screen-gif-21985764": null,
+            "https://tenor.com/view/seulyien-got7-got7yugyeom-yugyeom-blinking-gif-21985600": null
         }
     },
     "user": {
@@ -7027,7 +7090,13 @@
             "https://media.discordapp.net/attachments/741170480534519849/755632209444077708/unknown.gif": null,
             "https://media.discordapp.net/attachments/499373423378563083/749258574009729155/east_london.gif": null,
             "https://images-ext-1.discordapp.net/external/cmf2ZoSixYbvRl8xgMawTjgOtsGY8naF2yolAu5TK04/https/media.discordapp.net/attachments/715477112437473352/724872216814157834/image0.gif": null,
-            "https://media.discordapp.net/attachments/648704600437948421/757592437312061460/2901db22-111d-4b1b-af37-ddd0711c4d59.gif": null
+            "https://media.discordapp.net/attachments/648704600437948421/757592437312061460/2901db22-111d-4b1b-af37-ddd0711c4d59.gif": null,
+            "https://tenor.com/view/gamestop-gif-9877337": null,
+            "https://tenor.com/view/copy-that-eb-games-wtf-gif-3876164": null,
+            "https://tenor.com/view/xqc-gif-22748016": null,
+            "https://tenor.com/view/gollum-lord-of-the-rings-addicted-precious-gif-12703641": null,
+            "https://tenor.com/view/seulyien-got7-yugyeom-got7yugyeom-staring-at-screen-gif-21985764": null,
+            "https://tenor.com/view/seulyien-got7-got7yugyeom-yugyeom-blinking-gif-21985600": null
         },
         "893293074413916230": {
             "https://cdn.discordapp.com/attachments/712243005519560736/900601530313506816/temp.gif": null,
@@ -7035,7 +7104,8 @@
             "https://tenor.com/view/monkey-edgy-meme-wtf-pussy-gif-4947152": null,
             "https://tenor.com/view/pog-explode-shattered-broken-gif-15365808": null,
             "https://media.discordapp.net/attachments/161658064682876928/757673188321919136/image0-19.gif": null,
-            "https://tenor.com/view/becoming-liberal-bite-steel-trapped-factory-gif-11917714": null
+            "https://tenor.com/view/becoming-liberal-bite-steel-trapped-factory-gif-11917714": null,
+            "https://cdn.discordapp.com/attachments/841208671169675354/901740944838258699/temp.gif": null
         },
         "158878635766317056": {
             "https://tenor.com/view/bobux-roblox-embed-no-embed-perms-0bobux-gif-18287307": null,
@@ -7693,6 +7763,13 @@
             "https://cdn.discordapp.com/attachments/212597110770630656/592243363881680897/ned_bottom.gif": null,
             "https://cdn.discordapp.com/attachments/212597110770630656/592239844835459073/ned_top.gif": null,
             "https://cdn.discordapp.com/attachments/266688738883665920/603864799104729149/image4.gif": null
+        },
+        "379440775206797385": {
+            "https://tenor.com/view/typing-petty-fast-cloudy-with-a-chance-of-meatballs-flint-lockwood-gif-4907824": null,
+            "https://tenor.com/view/christian-bale-american-psycho-walk-jam-gif-16732505": null
+        },
+        "449959767834755123": {
+            "https://media.discordapp.net/attachments/707457666795962398/897933540266745906/850879268194877471.gif": null
         }
     }
 }
