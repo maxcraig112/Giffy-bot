@@ -5484,6 +5484,11 @@
             "741169124817764372",
             "841208671169675354",
             "217233850101661697"
+        ],
+        "https://media.discordapp.net/attachments/702322144041893918/800242058781786142/image0-8.gif": [
+            "741169124817764372",
+            "869864347449577512",
+            "449959767834755123"
         ]
     },
     "guild": {
@@ -6593,7 +6598,11 @@
             "https://cdn.discordapp.com/attachments/841208671169675354/901740944838258699/temp.gif": null,
             "https://media.discordapp.net/attachments/707457666795962398/897933540266745906/850879268194877471.gif": null,
             "https://tenor.com/view/seulyien-got7-yugyeom-got7yugyeom-staring-at-screen-gif-21985764": null,
-            "https://tenor.com/view/seulyien-got7-got7yugyeom-yugyeom-blinking-gif-21985600": null
+            "https://tenor.com/view/seulyien-got7-got7yugyeom-yugyeom-blinking-gif-21985600": null,
+            "https://tenor.com/view/fishington-discord-game-discord-fishington-game-hop-on-gif-21553808": null,
+            "https://media.discordapp.net/attachments/702322144041893918/800242058781786142/image0-8.gif": null,
+            "https://tenor.com/view/what-a-guy-gif-21144443": null,
+            "https://tenor.com/view/old-man-computer-not-working-broken-come-on-gif-16861225": null
         }
     },
     "user": {
@@ -7105,7 +7114,9 @@
             "https://tenor.com/view/pog-explode-shattered-broken-gif-15365808": null,
             "https://media.discordapp.net/attachments/161658064682876928/757673188321919136/image0-19.gif": null,
             "https://tenor.com/view/becoming-liberal-bite-steel-trapped-factory-gif-11917714": null,
-            "https://cdn.discordapp.com/attachments/841208671169675354/901740944838258699/temp.gif": null
+            "https://cdn.discordapp.com/attachments/841208671169675354/901740944838258699/temp.gif": null,
+            "https://tenor.com/view/fishington-discord-game-discord-fishington-game-hop-on-gif-21553808": null,
+            "https://tenor.com/view/what-a-guy-gif-21144443": null
         },
         "158878635766317056": {
             "https://tenor.com/view/bobux-roblox-embed-no-embed-perms-0bobux-gif-18287307": null,
@@ -7769,7 +7780,8 @@
             "https://tenor.com/view/christian-bale-american-psycho-walk-jam-gif-16732505": null
         },
         "449959767834755123": {
-            "https://media.discordapp.net/attachments/707457666795962398/897933540266745906/850879268194877471.gif": null
+            "https://media.discordapp.net/attachments/707457666795962398/897933540266745906/850879268194877471.gif": null,
+            "https://media.discordapp.net/attachments/702322144041893918/800242058781786142/image0-8.gif": null
         }
     }
 }

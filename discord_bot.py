@@ -119,6 +119,11 @@ def run_bot(TOKEN):
                         await message.channel.send(tags)
                 else:
                     no_gif_found(message)
+            if msg.split(" ",1)[0] == ".ttags":
+                text = msg.split(" ",1)[1]
+                print(text)
+                tags = Tagger(text).tags #get tags
+                await message.channel.send(tags)
             if msg == ".lgif":
                 gif = get_last(message)
                 if gif != "" and gif != None:
@@ -147,7 +152,7 @@ def run_bot(TOKEN):
                             for url in tags_json.subdict[term]:
                                 #if url already grabbed, increment score by one
                                 if url in urls:
-                                    scores[urls.index(url)] += (scores[urls.index(url)]+1)**2 
+                                    scores[urls.index(url)] += 1
                                 else:
                                     #otherwise, add to list, give score of 1
                                     urls += [url]
@@ -161,7 +166,7 @@ def run_bot(TOKEN):
                 if len(urls) > 0:
                     scores, urls = zip(*sorted(zip(scores,urls),reverse=True))
                     #print(urls,scores)
-                    txt = f"It took {int(timeit.default_timer() - start_time)} seconds to search through {size} tags with {sum([len(search_terms[i]) for i in range(len(search_terms))])} alternate search terms, out of {len(urls)} results, here are the top {min(len(urls),5)} i found! "
+                    txt = f"It took {int(timeit.default_timer() - start_time)} seconds to search through {size} tags, out of {len(urls)} results, here are the top {min(len(urls),5)} i found! "
                     for i in range(min(3,len(urls))):
                         #print 5 highest scoring gifs
                         txt += f"{urls[i]}\n"
