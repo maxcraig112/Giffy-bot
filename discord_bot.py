@@ -10,6 +10,7 @@ import validators
 from discord.ext import commands
 from URLJson import *
 import timeit
+from copy import copy
 
 def run_bot(TOKEN):
 
@@ -31,7 +32,7 @@ def run_bot(TOKEN):
     async def resize_and_send(gif, message):
         gif.save("temp.gif")
         while os.path.getsize("temp.gif") > 8000000:
-            await message.channel.send("Caption too big! resizing!")
+            #await message.channel.send("Caption too big! resizing!")
             gif = Gif("temp.gif")
             gif.resize(0.5)
             gif.save("temp.gif")
@@ -166,14 +167,128 @@ def run_bot(TOKEN):
                 if len(urls) > 0:
                     scores, urls = zip(*sorted(zip(scores,urls),reverse=True))
                     #print(urls,scores)
-                    txt = f"It took {int(timeit.default_timer() - start_time)} seconds to search through {size} tags, out of {len(urls)} results, here are the top {min(len(urls),5)} i found! "
-                    for i in range(min(3,len(urls))):
+                    txt = f"It took {int(timeit.default_timer() - start_time)} seconds to search through {size} tags, out of {len(urls)} results, here are the top {min(len(urls),6)} i found! "
+                    for i in range(min(6,len(urls))):
                         #print 5 highest scoring gifs
                         txt += f"{urls[i]}\n"
                     #print(scores[:5])
                     await message.channel.send(txt[:-1])
                     u = AttachmentURL(urls[min(len(urls)-1,4)],message.guild.id,message.channel.id,message.author.id)
                     last_gif_json(u)
+                else:
+                    await message.channel.send("sorry! no caption gifs with those tags can be found!")
+            if msg[:8] == ".asearch":
+                org_terms = msg[8:].replace(" ","").lower().split(",")
+                search_terms = msg[8:].replace(" ","").lower().split(",")
+                for i in range(len(search_terms)):
+                    if search_terms[i][-1] != "s":
+                        search_terms += [search_terms[i] + "s"]
+                urls = []
+                scores = []
+                max_tags = []
+
+                tags_json = JsonGifs("Json/tags.json","global")
+                size = len(tags_json.subdict)
+                start_time = timeit.default_timer()
+                #for every search term the user inputted
+                for term in search_terms:
+                    #for every single slice of that search term
+                    for i in range(len(term) + 1):
+                        #if search term exists in tags
+                        if tags_json.contains(term):
+                            # yoink every url inside tag, if url has been grabbed before, add to existing score
+                            for url in tags_json.subdict[term]:
+                                #if url already grabbed, increment score by one
+                                if url in urls:
+                                    scores[urls.index(url)] += 1
+                                else:
+                                    #otherwise, add to list, give score of 1
+                                    urls += [url]
+                                    scores += [i/len(term)]
+                                    caption_json = JsonGifs("Json/archivedcaptiongifs.json","global")
+                                    max_tags += [len(caption_json.subdict[url][-1])]
+                #sort urls by score
+                #print(urls,scores)
+                for i in range(len(scores)):
+                    scores[i] = scores[i]/max_tags[i]
+                if len(urls) > 0:
+                    
+                    await message.channel.send(f"{len(urls)} Gifs found! Just compiling (This may take up to 30 seconds)")
+                    if len(urls) == 1:
+                        await message.channel.send(f"{urls[0]}\nAfter only {round(timeit.default_timer() - start_time,0)} seconds, I searched through {size} tags and found this")#,file=discord.File("search.gif")
+                        return
+                    scores, urls = zip(*sorted(zip(scores,urls),reverse=True))
+                    FONT_PATH = "Fonts/Futura Extra Black Condensed Regular.otf"
+                    WIDTH = 1000
+                    HEIGHT = 1000
+                    #200,57,63 - red
+                    #54,57,63 - discord
+                    layout = Image.new("RGB",(WIDTH,HEIGHT),(54,57,63))
+
+                    gifs = [Gif(urls[i]) for i in range(min(6,len(urls)))]
+                    for i in range(len(gifs)):
+                        gifs[i]._get_image(gifs[i].img_reference)
+                    max_frames = min([len(gifs[i].frames) for i in range(len(gifs))])
+                    result_frames = []
+                    result_duration = [0] * max_frames
+
+                    titleFont = ImageFont.truetype(FONT_PATH,80)
+                    tagFont = ImageFont.truetype(FONT_PATH,40)
+                    d = ImageDraw.Draw(layout)
+
+                    #d.text((WIDTH//2,10),".Search",(255,255,255),titleFont,"mt")
+                    d.text((WIDTH//2,10),str(org_terms),(255,255,255),tagFont,"mt")
+                    if len(gifs) == 2:
+                        NUM_HORZ = 2
+                        NUM_VERT = 1
+                    elif len(gifs) == 3 or len(gifs) == 4:
+                        NUM_HORZ = 2
+                        NUM_VERT = 2
+                    elif len(gifs) == 5 or len(gifs) == 6:
+                        NUM_HORZ = 3
+                        NUM_VERT = 2
+                    START_HEIGHT = 0
+                    RES_HEIGHT = HEIGHT - START_HEIGHT
+                    RES_WIDTH = WIDTH
+
+                    #NUM_HORZ = 3
+                    SIDE_HORZ_PADDING = (RES_HEIGHT * 0.2)/NUM_HORZ
+                    INNER_HORZ_PADDING = (RES_HEIGHT * 0.1)/NUM_HORZ
+                    
+                    #NUM_VERT = 2
+                    SIDE_VERT_PADDING = (RES_WIDTH * 0.15)/NUM_VERT
+                    INNER_VERT_PADDING = (RES_WIDTH * 0.1)/NUM_VERT
+
+                    BOX_WIDTH = round((RES_WIDTH - 2*SIDE_HORZ_PADDING - (NUM_HORZ - 1) * INNER_HORZ_PADDING)/NUM_HORZ)
+                    BOX_HEIGHT = round((RES_HEIGHT - 2*SIDE_VERT_PADDING - (NUM_VERT - 1) * INNER_VERT_PADDING)/NUM_VERT)
+
+                    box_pos = []
+                    BOX_COUNT = NUM_HORZ * NUM_VERT
+                    for row in range(NUM_HORZ):
+                        for column in range(NUM_VERT):
+                            #print(row,column)
+                            TOP_LEFT_X = round(SIDE_HORZ_PADDING + (row * BOX_WIDTH) + ((row)*INNER_HORZ_PADDING))
+                            TOP_LEFT_Y = round(START_HEIGHT + SIDE_VERT_PADDING + (column * BOX_HEIGHT) + ((column)*INNER_VERT_PADDING))
+                            
+                            BOT_RIGHT_X = round(TOP_LEFT_X + BOX_WIDTH)
+                            BOT_RIGHT_Y = round(TOP_LEFT_Y + BOX_HEIGHT)
+                            box_pos += [(TOP_LEFT_X,TOP_LEFT_Y,BOT_RIGHT_X,BOT_RIGHT_Y)]
+                            #print(TOP_LEFT_X,TOP_LEFT_Y,BOT_RIGHT_X,BOT_RIGHT_Y)
+
+                    for i in range(max_frames):
+                        for box in range(len(gifs)):
+                            rel_frame = (i % len(gifs[box].frames))
+                            layout.paste(gifs[box].frames[rel_frame].resize((BOX_WIDTH,BOX_HEIGHT)),(box_pos[box]))
+                            if i < len(gifs[box].frames):
+                                result_duration[i] += gifs[box].durations[i]
+                        result_frames += [copy(layout)]
+                        result_duration[i] = result_duration[i]/len(gifs)
+
+                    result = Gif(None,result_frames,result_duration)
+                    #result_frames[0].save("search.gif", format="GIF",append_images=result_frames[1:],save_all=True,loop = 0, duration=[10 for i in range(len(result_frames))])
+                    await resize_and_send(result,message)
+                    await message.channel.send(f"After only {round(timeit.default_timer() - start_time,0)} seconds, I searched through {size} tags and found these top {len(gifs)} results!")#,file=discord.File("search.gif")
+                    #os.remove("search.gif")
                 else:
                     await message.channel.send("sorry! no caption gifs with those tags can be found!")
             if msg == ".decaption":

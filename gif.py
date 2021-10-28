@@ -21,11 +21,11 @@ pytesseract.tesseract_cmd = 'C:/Users/maxcr/Desktop/Executables/Tesseract/tesser
 
 class Gif:
 
-    def __init__(self, image_reference: str) -> None:
+    def __init__(self, image_reference: str = None, frames = None, durations = None) -> None:
         self.img_reference = image_reference
         self.img = None
-        self.frames = None
-        self.durations = None
+        self.frames = frames
+        self.durations = durations
         self.width = None
         self.height = None
 
@@ -84,6 +84,7 @@ class Gif:
         for i in range(0,self.img.n_frames):
             self.img.seek(i)
             frames += [self.img.convert("RGBA")]
+        self.frames = frames
         return frames
 
     def _get_duration(self) -> list:
@@ -94,6 +95,7 @@ class Gif:
         duration = []
         for i in range(len(self.frames)):
             duration += [self.frames[0].info["duration"]]
+        self.durations = duration
         return duration
 
     def _update_size(self):

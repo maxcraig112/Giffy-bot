@@ -5,7 +5,6 @@ from io import BytesIO, StringIO
 import os
 import validators
 import uuid
-from typing import Text, final
 import requests
 import urllib.request
 from shutil import *
