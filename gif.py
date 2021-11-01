@@ -7,7 +7,8 @@ from typing import Text
 import requests
 import urllib.request
 from shutil import *
-from PIL import Image, ImageDraw, ImageFont, ImageOps
+from PIL import Image, ImageDraw, ImageFont
+from PIL.ImageStat import Stat
 import numpy as np
 from pytesseract import *
 
@@ -57,12 +58,12 @@ class Gif:
                 #otherwise img is a directory path
                 img = Image.open(img)
         except:
-            return False
+            return None
         self.img = img
         self.frames = self._get_frames()
         self.durations = self._get_duration()
         self._update_size()
-        return True
+        return img
 
     def _get_file_name(self, file_name: str, path: str):
         res = ""
@@ -148,7 +149,7 @@ class Gif:
                     return None
                 i = 0
                 while i < self.width:
-                    x = image.getpixel((i,boundary))
+                    x = image.getpixel((i,boundary - 1))
                     if (x[0] not in rang and x[1] not in rang and x[2] not in rang):
                         #if there are any pixels at the bottom of the caption which are not the colour of the caption background
                         #then the image must not be a caption gif
@@ -292,5 +293,23 @@ class Gif:
             
         self.img.show()
 
+    def show_caption(self):
+        if self.img is None:
+            self.img = self._get_image(self.img_reference)
+
+        boundary = self.get_boundary()
+        if boundary is not None:
+            self.get_top_caption().show()
+
+
 if __name__ == "__main__":
-    pass
+    #img = Gif("https://tenor.com/view/fishington-discord-game-discord-fishington-game-hop-on-gif-21553808")
+    #img._get_image(img.img_reference)
+    #img.img.crop((0,0,img.width,89)).show()
+    #https://tenor.com/view/fishington-discord-game-discord-fishington-game-hop-on-gif-21553808
+    img = Gif("https://cdn.discordapp.com/attachments/712243005519560736/903479440993034260/temp.gif")
+    print(Stat(img.get_top_caption()).mean)
+    print(Stat(img._get_image(img.img_reference)).mean)
+    # for file in os.listdir("Tester Files/"):
+    #     Gif("Tester Files/"+file).show_caption()
+    

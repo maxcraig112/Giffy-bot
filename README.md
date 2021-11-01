@@ -29,16 +29,22 @@ Aims of the bot
 USE NLTK FOR WORD PROCESSING
 CHECK THAT PIXEL 0,0 OF FIRST AND SECOND FRAME REMAINS CONSTANT
 
-
-TODO:
-- fix problems where it thinks certain white caption gifs are gifs
+DONE:
 - Move json files to folder (DONE)
 - work out fix for duplicate gifs being archived (DONE)
-- implement search by user,guild,global, maybe in class?
-    - might require reformatting of tags.json into subtags global,guild,user (DONE)
-- interface for searching gifs and getting result
 - method for taking list of gifs and archiving (DONE)
+TODO:
+- improve captioning for large and small gifs, large and small text
+- fix problems where it thinks certain white caption gifs are gifs, and where it thinks some caption gifs aren't gifs
+- implement search by user,guild,global, maybe in class?
+- interface for searching gifs and getting result
 - create actual method for taking list of gifs
 - method for downloading all archived gifs, reprocesssing them
 - maybe make it so the order of search terms searched influences the score?
 - reprocess all gifs so that full text is included too
+- add functionality to select a gif from asearch to be sent fully to chat
+- add functionality which allows multiple pages of search
+- add functionality to allow gifs to be removed from database from search (if they're just bad or wrong)
+- Add better try,except code that's more robust for errors
+- create small thumbnails of gifs when storing in archives
+- if bot is captioning gif, automatically add to json with text inputted
