@@ -3,6 +3,8 @@ import os
 import random
 from re import M, search
 from typing import Dict
+
+from numpy.lib.function_base import median
 from gif import Gif
 from validators.url import url
 import discord
@@ -11,11 +13,12 @@ from discord.ext import commands
 from URLJson import *
 import timeit
 from copy import copy
+from statistics import mean
 
 def run_bot(TOKEN):
 
     client = commands.Bot(command_prefix=".")
-
+    CAPTION_MADE = False
     def get_last(message):
         #get the last gif which was posted into the server
             with open("Json/lastgif.json", "r") as f:
@@ -30,14 +33,14 @@ def run_bot(TOKEN):
         await message.channel.send("No previous gifs found in channel. This may be because I haven't been in the server long or I was offline when a gif was sent!")
     
     async def resize_and_send(gif, message):
-        gif.save("temp.gif")
-        while os.path.getsize("temp.gif") > 8000000:
+        gif.save(f"{message.channel.id}_{message.guild.id}.gif")
+        while os.path.getsize(f"{message.channel.id}_{message.guild.id}.gif") > 8000000:
             #await message.channel.send("Caption too big! resizing!")
-            gif = Gif("temp.gif")
+            gif = Gif(f"{message.channel.id}_{message.guild.id}.gif")
             gif.resize(0.5)
-            gif.save("temp.gif")
-        await message.channel.send(file=discord.File("temp.gif"))
-        os.remove("temp.gif")
+            gif.save(f"{message.channel.id}_{message.guild.id}.gif")
+        await message.channel.send(file=discord.File(f"{message.channel.id}_{message.guild.id}.gif"))
+        os.remove(f"{message.channel.id}_{message.guild.id}.gif")
 
     def gif_is_sent(message):
         if len(message.attachments) > 0 and os.path.splitext(message.attachments[-1].filename)[-1] == ".gif": # validators.url(message.attachments[-1].url) and 
@@ -55,6 +58,52 @@ def run_bot(TOKEN):
         dict[url.guildID][url.channelID] = url.url
         with open("Json/lastgif.json","w") as fw:
             json.dump(dict, fw, indent=4)
+
+    def store_gif(url,gif,data):
+        if gif.is_caption_gif():
+            if len(data) == 3:
+                caption = gif.text_from_caption() #get caption
+                tags = Tagger(caption).tags #get tags
+                data += [tags]
+            #await message.channel.send(tags)
+
+            tags_json = JsonGifs("Json/tags.json")
+            for tag in data[-1]:
+                tags_json.set_catagory('global')
+                tags_json.addsubKey(tag)
+                if not tags_json.contains_alt_url(url,subkey=tag):
+                    tags_json.add(url.url,data[:-1],tag)
+                tags_json.set_catagory('guild')
+                tags_json.addsubKey(url.guildID)
+                tags_json.addsubsubKey(url.guildID,tag)
+                if not tags_json.contains_alt_url(url,url.guildID,tag):
+                    tags_json.add(url.url,data[:-1],url.guildID,tag)
+                tags_json.set_catagory('user')
+                tags_json.addsubKey(url.userID)
+                tags_json.addsubsubKey(url.userID,tag)
+                if not tags_json.contains_alt_url(url,url.userID,tag):
+                    tags_json.add(url.url,data[:-1],url.userID,tag)
+            tags_json.dump_json()
+
+        #instantiate json archiving object, file open depends on whether gif contains a caption
+        archives = JsonGifs("Json/archivedcaptiongifs.json" if gif.is_caption_gif() else "Json/archivedgifs.json","global")
+        if not archives.contains_alt_url(url):
+            archives.add(url.url,data) #add url to global key
+        #print(archives.contains_alt_url(url))
+        archives.set_catagory("guild") #set catagory to guild key
+        
+        archives.addsubKey(url.guildID) #if server ID not in guild key, add, then add url to server ID
+        if not archives.contains_alt_url(url,url.guildID):
+            archives.add(url.url,None,url.guildID)
+        #print(archives.contains_alt_url(url,url.guildID))
+        archives.set_catagory("user") #if user ID not in user key, add, then add url to user ID
+        
+        archives.addsubKey(url.userID)
+        if not archives.contains_alt_url(url,url.userID):
+            archives.add(url.url,None,url.userID)
+        #print(archives.contains_alt_url(url,url.userID))
+
+        archives.dump_json() #save json file
     @client.event
     async def on_ready():
         print("Bot is ready")
@@ -68,15 +117,15 @@ def run_bot(TOKEN):
             if msg == ".test":
                 await message.channel.send("hello\nhow\nare\nyou")
             if msg == ".cgif":
-                gif = Gif(get_last(message))
-                gif._get_image(gif.img_reference)
+                gif = Gif(get_last(message),auto_download=True)
+                #gif._get_image(gif.img_reference)
                 if gif.img != None:
                     if gif.is_caption_gif():
                         await message.channel.send("The last gif has a caption")
                     else:
                         await message.channel.send("The last gif does not have a caption")
                 else:
-                    no_gif_found(message)
+                    await no_gif_found(message)
             if msg == ".rgif":
                 # open archived gifs, get random url from global
                 archive = JsonGifs("Json/archivedgifs.json","global")
@@ -100,8 +149,7 @@ def run_bot(TOKEN):
                         break
                     count += 1
             if msg == ".text":
-                gif = Gif(get_last(message))
-                gif._get_image(gif.img_reference)
+                gif = Gif(get_last(message),auto_download=True)
                 if gif.img != None:
                     text = gif.text_from_caption()
                     if text != None:
@@ -109,17 +157,16 @@ def run_bot(TOKEN):
                     else:
                         await message.channel.send("no text found")
                 else:
-                    no_gif_found(message)
+                    await no_gif_found(message)
             if msg == ".tags":
-                gif = Gif(get_last(message))
-                gif._get_image(gif.img_reference)
+                gif = Gif(get_last(message),auto_download=True)
                 if gif.img != None:
                     text = gif.text_from_caption()
                     if text != None:
                         tags = Tagger(text).tags #get tags
                         await message.channel.send(tags)
                 else:
-                    no_gif_found(message)
+                    await no_gif_found(message)
             if msg.split(" ",1)[0] == ".ttags":
                 text = msg.split(" ",1)[1]
                 print(text)
@@ -130,7 +177,7 @@ def run_bot(TOKEN):
                 if gif != "" and gif != None:
                     await message.channel.send(gif)
                 else:
-                    no_gif_found(message)
+                    await no_gif_found(message)
             if msg[:7] == ".search":
                 search_terms = msg[8:].replace(" ","").lower().split(",")
                 for i in range(len(search_terms)):
@@ -225,9 +272,7 @@ def run_bot(TOKEN):
                     #54,57,63 - discord
                     layout = Image.new("RGB",(WIDTH,HEIGHT),(54,57,63))
 
-                    gifs = [Gif(urls[i]) for i in range(min(6,len(urls)))]
-                    for i in range(len(gifs)):
-                        gifs[i]._get_image(gifs[i].img_reference)
+                    gifs = [Gif(urls[i],auto_download=True) for i in range(min(6,len(urls)))]
                     max_frames = min([len(gifs[i].frames) for i in range(len(gifs))])
                     result_frames = []
                     result_duration = [0] * max_frames
@@ -293,8 +338,7 @@ def run_bot(TOKEN):
                     await message.channel.send("sorry! no caption gifs with those tags can be found!")
             if msg == ".decaption":
                 await message.channel.send("decaptioning gif! give me a second to work!")
-                gif = Gif(get_last(message))
-                gif._get_image(gif.img_reference)
+                gif = Gif(get_last(message),auto_download=True)
                 if gif.img != None:
                     if gif.is_caption_gif():
                         gif.decaption()
@@ -307,89 +351,89 @@ def run_bot(TOKEN):
                 text = message.content.split(" ", 1)[1]
                 if text != "":
                     await message.channel.send("captioning gif! give me a second to work!")
-                    gif = Gif(get_last(message))
-                    gif._get_image(gif.img_reference)
+                    gif = Gif(get_last(message),auto_download=True)
                     if gif.img != None:
                         gif.caption(text)
                         await resize_and_send(gif, message)
                     else:
-                        no_gif_found(message)
+                        await no_gif_found(message)
                 else:
                     await message.channel.send("Please provide a caption!")
             if msg.split(" ")[0] == ".recaption":
                 text = message.content.split(" ", 1)[1]
                 if text != "":
                     await message.channel.send("recaptioning gif! give me a second to work!")
-                    gif = Gif(get_last(message))
-                    gif._get_image(gif.img_reference)
+                    gif = Gif(get_last(message),auto_download=True)
                     if gif.img != None:
                         gif.decaption()
                         gif.caption(text)
                         await resize_and_send(gif, message)
                     else:
-                        no_gif_found(message)
+                        await no_gif_found(message)
             if msg == ".speed":
-                gif = Gif(get_last(message))
-                gif._get_image(gif.img_reference)
+                gif = Gif(get_last(message),auto_download=True)
                 if gif.img != None:
                     await message.channel.send("speeding up gif!")
                     gif.change_speed()
                     await resize_and_send(gif, message)
                 else:
-                    no_gif_found(message)
+                    await no_gif_found(message)
+            if msg.split(" ")[0] == ".resize":
+                factor = float(msg.split(" ")[1])
+                gif = Gif(get_last(message),auto_download=True)
+                if gif.img != None:
+                    if gif.width * factor > 2500 or gif.height * factor > 2500:
+                        await message.channel.send("you're going to break my fucking computer don't resize it this much")
+                    else:
+                        await message.channel.send("resizing gif!")
+                        gif.resize(factor)
+                        await resize_and_send(gif,message)
+                else:
+                    await no_gif_found(message)
+            if msg == ".reverse":
+                gif = Gif(get_last(message),auto_download=True)
+                if gif.img != None:
+                    await message.channel.send("reversing gif!")
+                    gif.frames.reverse()
+                    gif.durations.reverse()
+                    await resize_and_send(gif,message)
+                else:
+                    await no_gif_found(message)
+            if msg == ".stats":
+                gif = Gif(get_last(message),auto_download=True)
+                if gif.img != None:
+                    stats = gif.stats()
+                    await message.channel.send(f"Ratio: {stats[0]}\nMean: {stats[1]}\nMedian: {stats[2]}\nrms: {stats[3]}\nvar: {stats[4]}\nstd dev: {stats[5]}")  
+                else:
+                    await no_gif_found(message)
+            if msg.split(" ")[0] == ".comgif":
+                gif1 = Gif(get_last(message),auto_download=True)
+                message.content = message.content.split(" ")[1]
+                if gif_is_sent(message) != None:
+                    dif = gif1.stats_dif(gif_is_sent(message))
+                    same = gif1.same_gif(gif_is_sent(message))
+                    await message.channel.send(f"Ratio Dif: {dif[0]}\nMean Dif: {dif[1]}\nMedian Dif (doesn't influence comp): {dif[2]}\nrms dif: {dif[3]}\nvar dif: {dif[4]}\nstd dev dif: {dif[5]}\nSame gif: {same}") 
+                else:
+                    await message.channel.send("link sent is not valid gif!")
+            if msg.split(" ")[0] == ".sgif":
+                gif1 = Gif(get_last(message),auto_download=True)
+                message.content = message.content.split(" ")[1]
+                if gif_is_sent(message) != None:
+                    if gif1.same_gif(gif_is_sent(message)):
+                        await message.channel.send("These gifs are the same")
+                    else:
+                        await message.channel.send("These gifs are not the same")
+                else:
+                    await message.channel.send("link sent is not valid gif!")
             if gif_is_sent(message) != None:
                 #create URLAttachment Object containing url location data
                 url = AttachmentURL(gif_is_sent(message),message.guild.id,message.channel.id,message.author.id)
                 #update the last gif sent in the guild and channel in the JSON file
                 last_gif_json(url)
                 #instantiate gif object
-                gif = Gif(url.url)
-                gif._get_image(gif.img_reference)
+                gif = Gif(url.url,auto_download=True)
                 data = [url.guildID,url.channelID,url.userID]
-                #if gif is a caption gif
-                if gif.is_caption_gif():
-                    caption = gif.text_from_caption() #get caption
-                    tags = Tagger(caption).tags #get tags
-                    data += [tags]
-                    #await message.channel.send(tags)
-
-                    tags_json = JsonGifs("Json/tags.json")
-                    for tag in tags:
-                        tags_json.set_catagory('global')
-                        tags_json.addsubKey(tag)
-                        if not tags_json.contains_alt_url(url,subkey=tag):
-                            tags_json.add(url.url,data[:-1],tag)
-                        tags_json.set_catagory('guild')
-                        tags_json.addsubKey(url.guildID)
-                        tags_json.addsubsubKey(url.guildID,tag)
-                        if not tags_json.contains_alt_url(url,url.guildID,tag):
-                            tags_json.add(url.url,data[:-1],url.guildID,tag)
-                        tags_json.set_catagory('user')
-                        tags_json.addsubKey(url.userID)
-                        tags_json.addsubsubKey(url.userID,tag)
-                        if not tags_json.contains_alt_url(url,url.userID,tag):
-                            tags_json.add(url.url,data[:-1],url.userID,tag)
-                    tags_json.dump_json()
-
-                #instantiate json archiving object, file open depends on whether gif contains a caption
-                archives = JsonGifs("Json/archivedcaptiongifs.json" if gif.is_caption_gif() else "Json/archivedgifs.json","global")
-                if not archives.contains_alt_url(url):
-                    archives.add(url.url,data) #add url to global key
-                #print(archives.contains_alt_url(url))
-                archives.set_catagory("guild") #set catagory to guild key
-                
-                archives.addsubKey(url.guildID) #if server ID not in guild key, add, then add url to server ID
-                if not archives.contains_alt_url(url,url.guildID):
-                    archives.add(url.url,None,url.guildID)
-                #print(archives.contains_alt_url(url,url.guildID))
-                archives.set_catagory("user") #if user ID not in user key, add, then add url to user ID
-                
-                archives.addsubKey(url.userID)
-                if not archives.contains_alt_url(url,url.userID):
-                    archives.add(url.url,None,url.userID)
-                #print(archives.contains_alt_url(url,url.userID))
-
-                archives.dump_json() #save json file
+                store_gif(url,gif,data)
         except Exception as e:
             await message.channel.send(f"{e}, Oops! Something went wrong!")
     
@@ -408,7 +452,7 @@ if __name__ == "__main__":
     #         print(f"{i}/{len(gifs)}")
     #         url = AttachmentURL(gifs[i].strip(),guildID,channelID,userID)
     #         #instantiate gif object
-    #         gif = Gif(url.url)
+    #         gif = Gif(url.url,auto_download=True)
     #         if gif._get_image(gif.img_reference):
     #             data = [url.guildID,url.channelID,url.userID]
     #             #if gif is a caption gif

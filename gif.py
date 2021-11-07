@@ -1,6 +1,9 @@
+from enum import auto
 from bs4 import *
 from io import BytesIO, StringIO
 import os
+from numpy.core.fromnumeric import mean
+from numpy.lib.twodim_base import triu_indices_from
 import validators
 import uuid
 from typing import Text
@@ -11,6 +14,7 @@ from PIL import Image, ImageDraw, ImageFont
 from PIL.ImageStat import Stat
 import numpy as np
 from pytesseract import *
+import math
 
 #from caption import get_top_caption
 pytesseract.tesseract_cmd = 'C:/Users/maxcr/Desktop/Executables/Tesseract/tesseract.exe'
@@ -22,13 +26,15 @@ pytesseract.tesseract_cmd = 'C:/Users/maxcr/Desktop/Executables/Tesseract/tesser
 
 class Gif:
 
-    def __init__(self, image_reference: str = None, frames = None, durations = None) -> None:
+    def __init__(self, image_reference: str = None, frames = None, durations = None, auto_download = False) -> None:
         self.img_reference = image_reference
         self.img = None
         self.frames = frames
         self.durations = durations
         self.width = None
         self.height = None
+        if auto_download:
+            self._get_image(image_reference)
 
     def _get_image(self,img):
         """
@@ -171,11 +177,21 @@ class Gif:
             return caption
         return None
     
+    def get_uncaptioned_gif(self):
+        boundary = self.get_boundary()
+        if boundary != None:
+            uncaption = self.frames[1].crop((0,boundary[1],self.width,self.height))
+            return uncaption
+        return self.frames[1]
     def text_from_caption(self) -> str:
         if self.img != None:
             caption = self.get_top_caption()
             if caption != None and caption != "":
-                return pytesseract.image_to_string(caption.resize(tuple(4*x for x in caption.size)))[:-2].replace("\n"," ")
+                img = Image.new("RGBA",[caption.size[0]*2,caption.size[1]*2])
+                img.paste(caption,(0,0))
+                #print(pytesseract.image_to_string(caption))
+                #pytesseract.image_to_string(caption.resize(tuple(4*x for x in caption.size)))
+                return pytesseract.image_to_string(img.resize(tuple(4*x for x in caption.size)))[:-2].replace("\n"," ")
             else:
                 return None
     
@@ -199,6 +215,12 @@ class Gif:
         if self.img is None:
             self.img = self._get_image(self.img_reference)
 
+        factor = 1
+        if self.width < 100:
+            factor = math.ceil(400/self.width)
+            self.resize(factor)
+            self._update_size()
+        
         FONT_PATH = "Fonts/Futura Extra Black Condensed Regular.otf"
         MIN_FONT_SIZE = 1
         MAX_FONT_SIZE = max(30,int(self.width/10))
@@ -218,7 +240,8 @@ class Gif:
         # number of pixels of largest word
         largest_word_size = max(word_size)
         # keep on reducing size of font until largest word fits within text box, or minimum font size reached
-        while(largest_word_size > MAX_SIZE and font_size >= MIN_FONT_SIZE):
+        word_factor = 0.5
+        while( (largest_word_size > MAX_SIZE and font_size >= MIN_FONT_SIZE) or largest_word_size > MAX_SIZE * word_factor):
             font_size -= 1
             largest_word_size = ImageFont.truetype(FONT_PATH, font_size).getsize(largest_word)[0]
         # instantiate font object with declared font size
@@ -243,20 +266,29 @@ class Gif:
             # iterate i to next word that hasn't been assigned a line
             i = j + 1
         NUM_LINES = len(lines)
+        INNER_PADDING_FACTOR = 0.3
+        LINE_HEIGHT = fnt.getsize(lines[0])[1]
         # the size of the caption space is equal to all the padding between lines, plus the height of all the combined lines
-        WHITE_BAR_SIZE = (NUM_LINES + 1) * VERTICAL_PADDING + (NUM_LINES * ImageFont.truetype(FONT_PATH, font_size).getsize(lines[0])[1])
+        #WHITE_BAR_SIZE = int((NUM_LINES + 1) * VERTICAL_PADDING + (NUM_LINES * ImageFont.truetype(FONT_PATH, font_size).getsize(lines[0])[1]))
+        WHITE_BAR_SIZE = int(2 * VERTICAL_PADDING + (NUM_LINES - 1) * LINE_HEIGHT * INNER_PADDING_FACTOR + (NUM_LINES * LINE_HEIGHT))
 
         text_caption = Image.new("RGBA",(self.width,WHITE_BAR_SIZE),(255,255,255))
         d = ImageDraw.Draw(text_caption)
         for i in range(NUM_LINES):
-            pos = (self.width//2,(i + 1) * VERTICAL_PADDING + (i * ImageFont.truetype(FONT_PATH, font_size).getsize(lines[0])[1]))
-            d.text(pos,lines[i],(0,0,0),fnt,"mt",VERTICAL_PADDING)
+            #pos = (self.width//2,int((i + 1) * VERTICAL_PADDING + (i * ImageFont.truetype(FONT_PATH, font_size).getsize(lines[0])[1])))
+            pos = (self.width//2,int(VERTICAL_PADDING + i * LINE_HEIGHT * INNER_PADDING_FACTOR + (i * LINE_HEIGHT) + (LINE_HEIGHT/2)))
+            d.text(pos,lines[i],(0,0,0),fnt,"mm",VERTICAL_PADDING)
         
         for k in range(len(self.frames)):
             new_frame = Image.new("RGBA",(self.width,WHITE_BAR_SIZE + self.height), color=(255,255,255))
             new_frame.paste(text_caption,(0,0))
             new_frame.paste(self.frames[k],(0,WHITE_BAR_SIZE))
             self.frames[k] = new_frame
+            if factor != 1:
+                self.frames[k].resize((int(self.width*factor**-1),int(self.height+WHITE_BAR_SIZE*factor**-1)))
+        
+        if factor != 1:
+            self.resize(factor**-1)
         self._update_size()
 
     def change_speed(self, factor: float = 2, constant: int = None):
@@ -280,6 +312,54 @@ class Gif:
 
         self.frames = [self.frames[i] for i in range(0,len(self.frames),int(1/factor))]
 
+    def stats(self):
+        """
+        returns the mean, median and rms of a gif in uncaptioned form. Can be used for comparison of 2 gifs to see if they are the same. rounds values to 2 d.p
+        """
+        gif = self.get_uncaptioned_gif()
+        #gif.show()
+        ratio = [round(gif.size[0]/gif.size[1],2)]
+        mean = [round(Stat(gif).mean[i],2) for i in range(3)]
+        median = [round(Stat(gif).median[i],2) for i in range(3)]
+        rms = [round(Stat(gif).rms[i],2) for i in range(3)]
+        var = [round(Stat(gif).var[i],2) for i in range(3)]
+        stddev = [round(Stat(gif).stddev[i],2) for i in range(3)]
+        return [ratio,mean,median,rms,var,stddev]
+
+    def stats_dif(self,img_reference):
+        gif2 = Gif(img_reference,auto_download=True)
+        if gif2 != None:
+            stats1 = self.stats()
+            stats2 = gif2.stats()
+            if stats1[0][0] < stats2[0][0]:
+                #swap around so that results are consistent
+                stats1,stats2 = stats2, stats1
+            dif = []
+            ratio_dif = round(stats1[0][0]/stats2[0][0],2)
+            # stats = [round(stats1[j][i]/stats2[j][i],2) for j in range(len(stats1)) for i in range(len(stats1[j]))]
+            mean_dif = round(mean([round(stats1[1][i]/stats2[1][i],2) for i in range(3)]),2)
+            median_dif = round(mean([round(stats1[2][i]/stats2[2][i],2) for i in range(3)]),2)
+            rms_dif = round(mean([round(stats1[3][i]/stats2[3][i],2) for i in range(3)]),2)
+            var_dif = round(mean([round(stats1[4][i]/stats2[4][i],2) for i in range(3)]),2)
+            std_dif = round(mean([round(stats1[5][i]/stats2[5][i],2) for i in range(3)]),2)
+            dif = [ratio_dif,mean_dif,median_dif,rms_dif,var_dif,std_dif]
+            return dif
+        else:
+            #could not parse img_reference
+            return None
+    def same_gif(self,img_reference) -> bool:
+        """
+        compares the stats of the object and a 2nd gif and returns a boolean representing whether or not it thinks the uncaptioned gifs are the same
+        """
+        dif = self.stats_dif(img_reference)
+        if dif != None:
+            r = range(90,111)
+            del dif[2]
+            same = all([(dif[i]*100 in r) for i in range(len(dif))])
+            return same
+        else:
+            #could not parse img_reference
+            return None
     def save(self, file_name: str = None, path: str = None):
         if self.img is None:
             self.img = self._get_image(self.img_reference)
@@ -303,13 +383,6 @@ class Gif:
 
 
 if __name__ == "__main__":
-    #img = Gif("https://tenor.com/view/fishington-discord-game-discord-fishington-game-hop-on-gif-21553808")
-    #img._get_image(img.img_reference)
-    #img.img.crop((0,0,img.width,89)).show()
-    #https://tenor.com/view/fishington-discord-game-discord-fishington-game-hop-on-gif-21553808
-    img = Gif("https://cdn.discordapp.com/attachments/712243005519560736/903479440993034260/temp.gif")
-    print(Stat(img.get_top_caption()).mean)
-    print(Stat(img._get_image(img.img_reference)).mean)
-    # for file in os.listdir("Tester Files/"):
-    #     Gif("Tester Files/"+file).show_caption()
+    img = Gif("https://cdn.discordapp.com/attachments/712243005519560736/905742068381524038/712243005519560736_470896999722516480.gif")
+    img.stats()
     
