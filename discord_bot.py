@@ -14,6 +14,7 @@ from URLJson import *
 import timeit
 from copy import copy
 from statistics import mean
+import time
 
 def run_bot(TOKEN):
 
@@ -37,9 +38,11 @@ def run_bot(TOKEN):
         while os.path.getsize(f"{message.channel.id}_{message.guild.id}.gif") > 8000000:
             #await message.channel.send("Caption too big! resizing!")
             gif = Gif(f"{message.channel.id}_{message.guild.id}.gif")
-            gif.resize(0.5)
+            print("resizing")
+            gif.resize(0.75)
             gif.save(f"{message.channel.id}_{message.guild.id}.gif")
         await message.channel.send(file=discord.File(f"{message.channel.id}_{message.guild.id}.gif"))
+        del gif
         os.remove(f"{message.channel.id}_{message.guild.id}.gif")
 
     def gif_is_sent(message):
@@ -411,7 +414,7 @@ def run_bot(TOKEN):
                 message.content = message.content.split(" ")[1]
                 if gif_is_sent(message) != None:
                     dif = gif1.stats_dif(gif_is_sent(message))
-                    same = gif1.same_gif(gif_is_sent(message))
+                    same = gif1.is_same_gif(gif_is_sent(message))
                     await message.channel.send(f"Ratio Dif: {dif[0]}\nMean Dif: {dif[1]}\nMedian Dif (doesn't influence comp): {dif[2]}\nrms dif: {dif[3]}\nvar dif: {dif[4]}\nstd dev dif: {dif[5]}\nSame gif: {same}") 
                 else:
                     await message.channel.send("link sent is not valid gif!")
@@ -419,7 +422,7 @@ def run_bot(TOKEN):
                 gif1 = Gif(get_last(message),auto_download=True)
                 message.content = message.content.split(" ")[1]
                 if gif_is_sent(message) != None:
-                    if gif1.same_gif(gif_is_sent(message)):
+                    if gif1.is_same_gif(gif_is_sent(message)):
                         await message.channel.send("These gifs are the same")
                     else:
                         await message.channel.send("These gifs are not the same")

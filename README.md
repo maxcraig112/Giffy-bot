@@ -36,6 +36,9 @@ CHECK THAT PIXEL 0,0 OF FIRST AND SECOND FRAME REMAINS CONSTANT
 - improve captioning for large and small gifs, large and small text (DONE)
 - give option to auto-download Gif when object instantiated (DONE)
 - save gifs with names depending on channel and server sent so errors don't occur (DONE)
+- gif captions sometimes flicker (DONE)
+- "[WinError 32] The process cannot access the file because it is being used by another process" error when deleting temp files from server other than test_server (DONE)
+- method for downloading all archived gifs (DONE)
 
 # TODO:
 - convert all cnd.discordapp.com to media.discordapp.net urls in json
@@ -43,9 +46,8 @@ CHECK THAT PIXEL 0,0 OF FIRST AND SECOND FRAME REMAINS CONSTANT
 - implement search by user,guild,global, maybe in class?
 - interface for searching gifs and getting result
 - create actual method for taking list of gifs
-- method for downloading all archived gifs, reprocesssing them
 - maybe make it so the order of search terms searched influences the score?
-- reprocess all gifs so that full text is included too
+- reprocess all gifs again to include more metadata
 - add functionality to select a gif from asearch to be sent fully to chat
 - add functionality which allows multiple pages of search
 - add functionality to allow gifs to be removed from database from search (if they're just bad or wrong)
@@ -54,6 +56,4 @@ CHECK THAT PIXEL 0,0 OF FIRST AND SECOND FRAME REMAINS CONSTANT
 - if bot is captioning gif, automatically add to json with text inputted
 - fix tagging system so that more words are included (a lot of tags in the dictionary isn't that bad since O(1) complexity)
     - create just stopwords for tags, keep all other words that are english
-- "[WinError 32] The process cannot access the file because it is being used by another process" error when deleting temp files from server other than test_server
 - potentially make it so giffy can caption MP4, jpeg,png as well
-- gif captions sometimes flicker

@@ -15,17 +15,16 @@ from PIL.ImageStat import Stat
 import numpy as np
 from pytesseract import *
 import math
+from URLJson import *
+import timeit
 
 #from caption import get_top_caption
 pytesseract.tesseract_cmd = 'C:/Users/maxcr/Desktop/Executables/Tesseract/tesseract.exe'
 #pytesseract.tesseract_cmd = '/home/pi/Desktop/Tesseract/tesseract.exe'
 
-#Search from all gifs
-#Search from gif in server
-#Search from gif from user
-
 class Gif:
 
+    #__init__
     def __init__(self, image_reference: str = None, frames = None, durations = None, auto_download = False) -> None:
         self.img_reference = image_reference
         self.img = None
@@ -36,6 +35,7 @@ class Gif:
         if auto_download:
             self._get_image(image_reference)
 
+    #region Updator Method
     def _get_image(self,img):
         """
         Takes any expected form of image path and converts it into PIL Image Object
@@ -108,7 +108,9 @@ class Gif:
     def _update_size(self):
         self.width = self.frames[0].size[0]
         self.height = self.frames[0].size[1]
+    #endregion
 
+    #region Boolean Methods
     def is_caption_gif(self) -> bool:
         """
         Gets the result of the get_boundary method, if the method returns a tuple,
@@ -117,51 +119,67 @@ class Gif:
         res = self.get_boundary()
         return res != None
     
+    def is_same_gif(self,img_reference) -> bool:
+        """
+        compares the stats of the object and a 2nd gif and returns a boolean representing whether or not it thinks the uncaptioned gifs are the same
+        """
+        dif = self.stats_dif(img_reference)
+        if dif != None:
+            r = range(90,111)
+            del dif[2]
+            same = all([(dif[i]*100 in r) for i in range(len(dif))])
+            return same
+        else:
+            #could not parse img_reference
+            return None
+    #endregion
+
+    #region Captioning Methods
     def get_boundary(self) -> tuple:
-        """
-        For an Image object which contains a caption, the method will return a tuple
-        representing the box which contains the top caption.
-        
-        If the Image object does not contain a caption, the method will return None
+            """
+            For an Image object which contains a caption, the method will return a tuple
+            representing the box which contains the top caption.
+            
+            If the Image object does not contain a caption, the method will return None
 
-        Program currently considers the colour of the pixels 5 off from the left side
-        This is to prevent small white bars from impacting the boundary finding
-        If constant offset becomes a problem, could change it to 5% of the gif width.
+            Program currently considers the colour of the pixels 5 off from the left side
+            This is to prevent small white bars from impacting the boundary finding
+            If constant offset becomes a problem, could change it to 5% of the gif width.
 
-        uses the 2nd frame of the Image as a method for determining if it contains
-        a caption, this is because the 1st frame may be completely white, skewing results.
+            uses the 2nd frame of the Image as a method for determining if it contains
+            a caption, this is because the 1st frame may be completely white, skewing results.
 
-        """
-        if self.img is None:
-            self.img = self._get_image(self.img_reference)
+            """
+            if self.img is None:
+                self.img = self._get_image(self.img_reference)
 
-        if self.img != None:
-            image = self.frames[1]
-            background = image.getpixel((5,0))
-            rang = range(220,256)
-            if(background[0] in rang and background[1] in rang and background[2] in rang and background[3] != 0):
-                boundary = 0
-                x = image.getpixel((5,boundary))
-                while(boundary < self.height and x == background):
+            if self.img != None:
+                image = self.frames[1]
+                background = image.getpixel((5,0))
+                rang = range(220,256)
+                if(background[0] in rang and background[1] in rang and background[2] in rang and background[3] != 0):
+                    boundary = 0
                     x = image.getpixel((5,boundary))
-                    boundary += 10
-                if boundary >= self.height:
-                    #return None
-                    boundary -= 10
-                while(image.getpixel((5,boundary)) != background):
-                    boundary -= 1
-                if boundary in range(int(self.height * 0.95),self.height + 1):
-                    #if caption takes up over 95% of the screen, gif most likely isn't a caption gif, but instead is just solid white background
-                    return None
-                i = 0
-                while i < self.width:
-                    x = image.getpixel((i,boundary - 1))
-                    if (x[0] not in rang and x[1] not in rang and x[2] not in rang):
-                        #if there are any pixels at the bottom of the caption which are not the colour of the caption background
-                        #then the image must not be a caption gif
+                    while(boundary < self.height and x == background):
+                        x = image.getpixel((5,boundary))
+                        boundary += 10
+                    if boundary >= self.height:
+                        #return None
+                        boundary -= 10
+                    while(image.getpixel((5,boundary)) != background):
+                        boundary -= 1
+                    if boundary in range(int(self.height * 0.95),self.height + 1):
+                        #if caption takes up over 95% of the screen, gif most likely isn't a caption gif, but instead is just solid white background
                         return None
-                    i  += 10
-                return (self.width,boundary + 1)
+                    i = 0
+                    while i < self.width:
+                        x = image.getpixel((i,boundary - 1))
+                        if (x[0] not in rang and x[1] not in rang and x[2] not in rang):
+                            #if there are any pixels at the bottom of the caption which are not the colour of the caption background
+                            #then the image must not be a caption gif
+                            return None
+                        i  += 10
+                    return (self.width,boundary + 1)
 
     def get_top_caption(self):
         """
@@ -183,6 +201,7 @@ class Gif:
             uncaption = self.frames[1].crop((0,boundary[1],self.width,self.height))
             return uncaption
         return self.frames[1]
+    
     def text_from_caption(self) -> str:
         if self.img != None:
             caption = self.get_top_caption()
@@ -194,22 +213,6 @@ class Gif:
                 return pytesseract.image_to_string(img.resize(tuple(4*x for x in caption.size)))[:-2].replace("\n"," ")
             else:
                 return None
-    
-    def _crop(self, boundary: tuple,):
-        if self.img is None:
-            self.img = self._get_image(self.img_reference)
-
-        for i in range(len(self.frames)):
-            self.frames[i] = self.frames[i].crop(boundary)
-            self._update_size()
-    
-    def decaption(self):
-        boundary = self.get_boundary()
-        if boundary != None:
-            self._crop((0,boundary[1]+1,boundary[0],self.height))
-            self._update_size()
-        else:
-            return None
     
     def caption(self, msg):
         if self.img is None:
@@ -224,7 +227,8 @@ class Gif:
         FONT_PATH = "Fonts/Futura Extra Black Condensed Regular.otf"
         MIN_FONT_SIZE = 1
         MAX_FONT_SIZE = max(30,int(self.width/10))
-        VERTICAL_PADDING = int(0.05 * self.height) #max(10,int(img.size[1]/25))
+        VERTICAL_PADDING = int(0.1 * self.height) #max(10,int(img.size[1]/25))
+        INNER_PADDING_FACTOR = 0.1
         HORIZONTAL_PADDING = int(0.05 * self.width)#max(10,int(img.size[0]/100))
         MAX_SIZE = self.width - 2 * HORIZONTAL_PADDING
         font_size = MAX_FONT_SIZE
@@ -265,8 +269,8 @@ class Gif:
             lines += [line]
             # iterate i to next word that hasn't been assigned a line
             i = j + 1
+        
         NUM_LINES = len(lines)
-        INNER_PADDING_FACTOR = 0.3
         LINE_HEIGHT = fnt.getsize(lines[0])[1]
         # the size of the caption space is equal to all the padding between lines, plus the height of all the combined lines
         #WHITE_BAR_SIZE = int((NUM_LINES + 1) * VERTICAL_PADDING + (NUM_LINES * ImageFont.truetype(FONT_PATH, font_size).getsize(lines[0])[1]))
@@ -291,6 +295,24 @@ class Gif:
             self.resize(factor**-1)
         self._update_size()
 
+    def decaption(self):
+        boundary = self.get_boundary()
+        if boundary != None:
+            self._crop((0,boundary[1]+1,boundary[0],self.height))
+            self._update_size()
+        else:
+            return None
+    #endregion
+
+    #region Image Manipulation Methods
+    def _crop(self, boundary: tuple,):
+        if self.img is None:
+            self.img = self._get_image(self.img_reference)
+
+        for i in range(len(self.frames)):
+            self.frames[i] = self.frames[i].crop(boundary)
+            self._update_size()
+    
     def change_speed(self, factor: float = 2, constant: int = None):
         if self.img is None:
             self.img = self._get_image(self.img_reference)
@@ -302,16 +324,33 @@ class Gif:
         if self.img is None:
             self.img = self._get_image(self.img_reference)
 
-        for i in range(len(self.frames)):
-            self.frames[i] = self.frames[i].resize((int(self.width*factor),int(self.height*factor)))
-        self._update_size()
+        #if gif has a caption, crop gif and caption individually
+        if self.is_caption_gif():
+            #get boundary of caption
+            boundary = self.get_boundary()
+            caption = self.get_top_caption().resize((int(self.width*factor),int(boundary[1]*factor)))
+            frames = []
+            for i in range(len(self.frames)):
+                new_frame = Image.new("RGBA",(int(self.width * factor),int(self.height * factor)), color=(255,255,255))
+                frames += [self.frames[i].crop((0,boundary[1],self.width,self.height)).resize((int(self.width * factor),int((self.height - boundary[1]) * factor)))]
+                new_frame.paste(caption,(0,0))
+                new_frame.paste(frames[-1],(0,int(boundary[1]*factor)))
+                frames[-1] = new_frame
+            self.frames = frames
+        #if gif has no caption, just crop the whole gif
+        else:
+            for i in range(len(self.frames)):
+                self.frames[i] = self.frames[i].resize((int(self.width*factor),int(self.height*factor)))
+        self._update_size()     
     
     def reduce_frames(self, factor: float = 0.5):
         if self.img is None:
             self.img = self._get_image(self.img_reference)
 
         self.frames = [self.frames[i] for i in range(0,len(self.frames),int(1/factor))]
+    #endregion
 
+    #region Image Stat Methods
     def stats(self):
         """
         returns the mean, median and rms of a gif in uncaptioned form. Can be used for comparison of 2 gifs to see if they are the same. rounds values to 2 d.p
@@ -347,19 +386,9 @@ class Gif:
         else:
             #could not parse img_reference
             return None
-    def same_gif(self,img_reference) -> bool:
-        """
-        compares the stats of the object and a 2nd gif and returns a boolean representing whether or not it thinks the uncaptioned gifs are the same
-        """
-        dif = self.stats_dif(img_reference)
-        if dif != None:
-            r = range(90,111)
-            del dif[2]
-            same = all([(dif[i]*100 in r) for i in range(len(dif))])
-            return same
-        else:
-            #could not parse img_reference
-            return None
+    #endregion
+
+    #region Image Storing/Showing Methods
     def save(self, file_name: str = None, path: str = None):
         if self.img is None:
             self.img = self._get_image(self.img_reference)
@@ -380,9 +409,23 @@ class Gif:
         boundary = self.get_boundary()
         if boundary is not None:
             self.get_top_caption().show()
+    #endregion
 
+def save_all_gifs(file_name,json_file):
+    f = open(file_name, "w")
+    gifs_json = JsonGifs(json_file)
+    gifs_json.set_catagory("global")
+    print(len("Number of gifs: " + gifs_json.subdict))
+    start = timeit.default_timer()
+    for i in gifs_json.subdict:
+        f.write(f"{i}\n")
+    print("Time taken: " + round(timeit.default_timer() - start,2))
+    f.close()
 
 if __name__ == "__main__":
-    img = Gif("https://cdn.discordapp.com/attachments/712243005519560736/905742068381524038/712243005519560736_470896999722516480.gif")
-    img.stats()
-    
+    # img = Gif("https://tenor.com/view/jim-carrey-stoned-frozen-dead-inside-gif-15445047")
+    # img.caption("try not to say deez nuts challenge")
+    # img.save("test.gif")
+    # img.resize(0.5)
+    # img.save("test2.gif")
+    save_all_gifs("all_caption_gifs.txt","Json/archivedcaptiongifs.json")
