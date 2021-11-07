@@ -1,10 +1,10 @@
 # Giffy-Bot
-A mutlipurpose repos designed to allow the de-captioning and tagging of gifs, as well as other functionality to do with the catagorising, archiving and searching of gifs.
+A multipurpose repos designed to allow the de-captioning and tagging of gifs, as well as other functionality to do with the catagorising, archiving and searching of gifs.
 
 The repos provides abstraction of these commands through the discord bot Giffy
 
 
-Current list of Bot Commands
+# Current list of Bot Commands
 - decaption a caption gif
 - return text in a gif
 - store last gif posted to server
@@ -29,12 +29,16 @@ Aims of the bot
 USE NLTK FOR WORD PROCESSING
 CHECK THAT PIXEL 0,0 OF FIRST AND SECOND FRAME REMAINS CONSTANT
 
-DONE:
+# DONE:
 - Move json files to folder (DONE)
 - work out fix for duplicate gifs being archived (DONE)
 - method for taking list of gifs and archiving (DONE)
-TODO:
-- improve captioning for large and small gifs, large and small text
+- improve captioning for large and small gifs, large and small text (DONE)
+- give option to auto-download Gif when object instantiated (DONE)
+- save gifs with names depending on channel and server sent so errors don't occur (DONE)
+
+# TODO:
+- convert all cnd.discordapp.com to media.discordapp.net urls in json
 - fix problems where it thinks certain white caption gifs are gifs, and where it thinks some caption gifs aren't gifs
 - implement search by user,guild,global, maybe in class?
 - interface for searching gifs and getting result
@@ -48,3 +52,8 @@ TODO:
 - Add better try,except code that's more robust for errors
 - create small thumbnails of gifs when storing in archives
 - if bot is captioning gif, automatically add to json with text inputted
+- fix tagging system so that more words are included (a lot of tags in the dictionary isn't that bad since O(1) complexity)
+    - create just stopwords for tags, keep all other words that are english
+- "[WinError 32] The process cannot access the file because it is being used by another process" error when deleting temp files from server other than test_server
+- potentially make it so giffy can caption MP4, jpeg,png as well
+- gif captions sometimes flicker
