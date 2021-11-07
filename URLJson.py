@@ -11,7 +11,7 @@ from shutil import *
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 import numpy as np
 from pytesseract import *
-from gif import Gif
+#from gif import Gif
 from enum import Enum
 from nltk.tokenize import word_tokenize
 import nltk
@@ -139,10 +139,15 @@ class Tagger:
         self.tags = self._process_caption()
 
     def _process_caption(self):
+        #remove non unicode characters
         text = self.caption.encode("ascii","ignore")
         text = text.decode()
+        #remove all symbols
+        text = ''.join(ch for ch in text if (ch.isalnum() or ch == " "))
+        #tokenize and get word types
         tokens = word_tokenize(text)
         alltags = nltk.pos_tag(tokens)
+        #get stop words
         stop_words = set(stopwords.words("english"))
         #print(alltags)
         sub_tags = []
@@ -156,7 +161,8 @@ class Tagger:
         final_tags = []
         #remove all tags that aren't nouns, adjectives, verbs, and add only lowercase words to final_tags
         for i in sub_tags:
-            if i[1][0] in ["J","N","V"] and i[0].lower() not in final_tags:
+            #if correct word type, tag not already included and len is > 1
+            if i[1][0] in ["J","N","V","I","D"] and i[0].lower() not in final_tags and len(i[0]) > 1:
                 final_tags += [i[0].lower()]
         #print(final_tags)
         return final_tags
@@ -164,7 +170,8 @@ class Tagger:
 
 
 if __name__ == "__main__":
-   tag = Tagger("Releasing my 9 (sex ‘antoni is gay‘)trillion trained fire ants on the homeless man who was blinking my coordinates in binary to my gangstalkers")
+   tag = Tagger("Me going to the among us festival (a doctor told me to seek professional help because i have 122 'imposter syndrome') ")
+   print(tag.tags)
     # captiongifs = JsonCaptionGifs("test.json")
     # captiongifs.set_catagory("global")
     # print(captiongifs.subdict)
