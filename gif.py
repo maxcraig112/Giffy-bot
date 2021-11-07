@@ -17,6 +17,7 @@ from pytesseract import *
 import math
 from URLJson import *
 import timeit
+from difflib import SequenceMatcher
 
 #from caption import get_top_caption
 pytesseract.tesseract_cmd = 'C:/Users/maxcr/Desktop/Executables/Tesseract/tesseract.exe'
@@ -386,6 +387,27 @@ class Gif:
         else:
             #could not parse img_reference
             return None
+
+    def get_metadata(self, ID: AttachmentURL) -> list:
+        """
+        input an AttachmentURL object, and given the type of gif, returns the metadata contains
+        - Guild ID
+        - Channel ID
+        - User ID
+        - Whole text (if caption gif)
+        - Tags (if caption gif)
+        - Stat Data
+        """
+        data = []
+        data += [ID.guildID]
+        data += [ID.channelID]
+        data += [ID.userID]
+        if self.is_caption_gif() and len(self.text_from_caption()) > 0:
+            data += [self.text_from_caption()]
+            data += [Tagger(self.text_from_caption()).tags]
+        data += [self.stats()]
+        return data
+    
     #endregion
 
     #region Image Storing/Showing Methods
@@ -412,20 +434,43 @@ class Gif:
     #endregion
 
 def save_all_gifs(file_name,json_file):
-    f = open(file_name, "w")
-    gifs_json = JsonGifs(json_file)
-    gifs_json.set_catagory("global")
-    print(len("Number of gifs: " + gifs_json.subdict))
-    start = timeit.default_timer()
-    for i in gifs_json.subdict:
-        f.write(f"{i}\n")
-    print("Time taken: " + round(timeit.default_timer() - start,2))
-    f.close()
+    """
+    From a specified json_file, downloads all gifs url within the "global" subdictionary, and stores them in the designated file
+    """
+    with open(file_name, "w") as f:
+        gifs_json = JsonGifs(json_file)
+        gifs_json.set_catagory("global")
+        print("Number of gifs: " + str(len(gifs_json.subdict)))
+        start = timeit.default_timer()
+        for i in gifs_json.subdict:
+            f.write(f"{i}\n")
+        print("Time taken: " + str(round(timeit.default_timer() - start,2)))
 
+def convert_gifs(file_name):
+    """
+    given a file of gif urls, replaces all cdn.discordapp.com url prefixes with media.discordapp.com, and removes any duplicates
+    """
+    old_urls = []
+    with open(file_name,"r") as f:
+        old_urls = f.readlines()
+    new_urls = []
+    for i in old_urls:
+        if i[:26] == "https://cdn.discordapp.com":
+            i = "https://media.discordapp.net" + i[26:]
+        if i not in new_urls:
+            new_urls += [i]
+    with open(file_name, "w") as f:
+        for i in new_urls:
+            f.write(f"{i}")
+        
+    
 if __name__ == "__main__":
     # img = Gif("https://tenor.com/view/jim-carrey-stoned-frozen-dead-inside-gif-15445047")
     # img.caption("try not to say deez nuts challenge")
     # img.save("test.gif")
     # img.resize(0.5)
     # img.save("test2.gif")
-    save_all_gifs("all_caption_gifs.txt","Json/archivedcaptiongifs.json")
+    
+    #save_all_gifs("All gifs/all_regular_gifs.txt","Json/archivedgifs.json")
+    #convert_gifs("All gifs/all_regular_gifs.txt")
+    pass
