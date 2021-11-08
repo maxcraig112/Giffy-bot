@@ -41,8 +41,9 @@ CHECK THAT PIXEL 0,0 OF FIRST AND SECOND FRAME REMAINS CONSTANT
 - method for downloading all archived gifs (DONE)
 - convert all cnd.discordapp.com to media.discordapp.net urls in json (DONE)
 - fix tagging system so that more words are included (a lot of tags in the dictionary isn't that bad since O(1) complexity) (DONE)
-- bot can now compare text of 2 caption gifs and return whether they are 80% the same sequence
-- bot can return whether or not it thinks 2 gifs are the same (caption and all)
+- bot can now compare text of 2 caption gifs and return whether they are 80% the same sequence (DONE)
+- bot can return whether or not it thinks 2 gifs are the same (caption and all) (DONE)
+- increased __init__ robustness by allowing url,PIL object and Gif Object instantiation
 
 # TODO:
 - fix problems where it thinks certain white caption gifs are gifs, and where it thinks some caption gifs aren't gifs
@@ -59,3 +60,4 @@ CHECK THAT PIXEL 0,0 OF FIRST AND SECOND FRAME REMAINS CONSTANT
 - if bot is captioning gif, automatically add to json with text inputted
     - create just stopwords for tags, keep all other words that are english
 - potentially make it so giffy can caption MP4, jpeg,png as well
+- refine stop_words list so that some words aren't removed
