@@ -62,3 +62,4 @@ CHECK THAT PIXEL 0,0 OF FIRST AND SECOND FRAME REMAINS CONSTANT
 - potentially make it so giffy can caption MP4, jpeg,png as well
 - refine stop_words list so that some words aren't removed
 - if .rgif or .rcgif are used, don't try and process those gifs
+- program for scraping urls from a channel using channel.history

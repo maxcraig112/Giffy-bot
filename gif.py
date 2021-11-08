@@ -384,18 +384,25 @@ class Gif:
     #endregion
 
     #region Image Stat Methods
-    def stats(self):
+    def stats(self,decaption=True,boundary:tuple=None,frame = 0):
         """
         returns the mean, median and rms of a gif in uncaptioned form. Can be used for comparison of 2 gifs to see if they are the same. rounds values to 2 d.p
         """
-        gif = self.get_uncaptioned_gif()
-        #gif.show()
+        if decaption:
+            gif = self.get_uncaptioned_gif()
+        else:
+            gif = self.frames[frame]
+        if boundary != None:
+            assert boundary[2] <= gif.size[0] and boundary[3] <= gif.size[1]
+            gif = gif.crop(boundary)
+        gif.show()
+        x = Stat(gif).mean
         ratio = [round(gif.size[0]/gif.size[1],2)]
-        mean = [round(Stat(gif).mean[i],2) for i in range(3)]
-        median = [round(Stat(gif).median[i],2) for i in range(3)]
-        rms = [round(Stat(gif).rms[i],2) for i in range(3)]
-        var = [round(Stat(gif).var[i],2) for i in range(3)]
-        stddev = [round(Stat(gif).stddev[i],2) for i in range(3)]
+        mean = [round(Stat(gif).mean[i],2) for i in range(min(len(Stat(gif).mean),3))]
+        median = [round(Stat(gif).median[i],2) for i in range(min(len(Stat(gif).median),3))]
+        rms = [round(Stat(gif).rms[i],2) for i in range(min(len(Stat(gif).rms),3))]
+        var = [round(Stat(gif).var[i],2) for i in range(min(len(Stat(gif).var),3))]
+        stddev = [round(Stat(gif).stddev[i],2) for i in range(min(len(Stat(gif).stddev),3))]
         return [ratio,mean,median,rms,var,stddev]
 
     def stats_dif(self,img_reference):
@@ -482,7 +489,10 @@ if __name__ == "__main__":
     # img.save("test.gif")
     # img.resize(0.5)
     # img.save("test2.gif")
-    img = Gif("https://cdn.discordapp.com/attachments/712243005519560736/907062523751190548/712243005519560736_470896999722516480.gif",auto_download=True)
-    print(type(img.img)==PIL.GifImagePlugin.GifImageFile)
-    print(img.stats_dif("https://cdn.discordapp.com/attachments/712243005519560736/907062478884712488/712243005519560736_470896999722516480.gif"))
+    img = Gif("Tester Files/test4.gif",auto_download=True)
+    print(img.stats(decaption=False))
+    print(img.stats(decaption=False,frame=1))
     pass
+
+    #get image file of frame[0]
+    #get image file of frames[1]

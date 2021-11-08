@@ -50,12 +50,12 @@ def convert_gifs(file_name):
         for i in new_urls:
             f.write(f"{i}")
 
-def process_gifs(urls_filename, caption_json, uncaption_json, tags_json):
+def process_url(urls_filename, caption_json, uncaption_json, tags_json):
     """
-    given a file of gif urls, go throughs them all one by one and processes them, obtaining all their metadata and storing them in the designated json
-    - returns a lst of urls that could not be processes
+    given a url directory, downloads the image, processing it, obtaining it's metadata, and storing it in it's respective json file if it isn't already in the file.
     """
     pass
+
 
 if __name__ == "__main__":
     #save_all_gifs("All gifs/all_regular_gifs.txt","Json/archivedgifs.json")
