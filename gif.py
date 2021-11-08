@@ -47,6 +47,10 @@ class Gif:
         try:
             if type(img) != str:
                 #image_path must already be in Object form
+                self.img = img
+                self.frames = self._get_frames()
+                self.durations = self._get_duration()
+                self._update_size()
                 return img
             if validators.url(img):
                 #attempt to request url data
@@ -87,7 +91,8 @@ class Gif:
         Takes as input a PIL Image Object and returns a list of all frames contained
         within the Image. If Image Object is not GIF, len(frames) == 1
         """
-        self._get_image(self.img)
+        if self.img == None:
+            self._get_image(self.img)
         frames = []
         for i in range(0,self.img.n_frames):
             self.img.seek(i)
@@ -126,13 +131,36 @@ class Gif:
         """
         dif = self.stats_dif(img_reference)
         if dif != None:
-            r = range(90,111)
+            r = range(85,116)
             del dif[2]
-            same = all([(dif[i]*100 in r) for i in range(len(dif))])
+            b = [(int(dif[i]*100) in r) for i in range(len(dif))]
+            same = all(b)
             return same
         else:
             #could not parse img_reference
             return None
+    
+    def is_same_caption(self,img_reference) -> bool:
+        """
+        Compares the captions of 2 gifs and returns a boolean that represents whether or not it thinks the gifs has similar enough captions to be considered the same
+        - uses SequenceMatching where the confidence has to be 0.8 for it to be the same caption
+        """
+        gif2 = Gif(img_reference,auto_download=True)
+        if gif2 != None:
+            if gif2.is_caption_gif() and self.is_caption_gif():
+                dif = self.caption_dif(img_reference)
+                return (dif != None and dif >= 0.8)
+            elif not self.is_caption_gif() and not gif2.is_caption_gif():
+                return True
+        return False
+    
+    def is_same_caption_gif(self,img_reference) -> bool:
+        """
+        Combines the functionality of the is_same_gif and is_same_caption methods to return whether or not the program thinks 2 gifs are exactly the same
+        """
+        same_text = self.is_same_caption(img_reference)
+        same_gif = self.is_same_gif(img_reference)
+        return same_text and same_gif
     #endregion
 
     #region Captioning Methods
@@ -383,9 +411,19 @@ class Gif:
             var_dif = round(mean([round(stats1[4][i]/stats2[4][i],2) for i in range(3)]),2)
             std_dif = round(mean([round(stats1[5][i]/stats2[5][i],2) for i in range(3)]),2)
             dif = [ratio_dif,mean_dif,median_dif,rms_dif,var_dif,std_dif]
+            
             return dif
         else:
             #could not parse img_reference
+            return None
+
+    def caption_dif(self,img_reference):
+        gif2 = Gif(img_reference,auto_download=True)
+        if gif2 != None and (self.is_caption_gif() and gif2.is_caption_gif()):
+            text1 = self.text_from_caption()
+            text2 = gif2.text_from_caption()
+            return SequenceMatcher(None,text1,text2).ratio()
+        else:
             return None
 
     def get_metadata(self, ID: AttachmentURL) -> list:
@@ -473,4 +511,6 @@ if __name__ == "__main__":
     
     #save_all_gifs("All gifs/all_regular_gifs.txt","Json/archivedgifs.json")
     #convert_gifs("All gifs/all_regular_gifs.txt")
+    img = Gif("https://cdn.discordapp.com/attachments/712243005519560736/907062523751190548/712243005519560736_470896999722516480.gif")
+    print(img.stats_dif("https://cdn.discordapp.com/attachments/712243005519560736/907062478884712488/712243005519560736_470896999722516480.gif"))
     pass

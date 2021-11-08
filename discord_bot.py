@@ -422,7 +422,10 @@ def run_bot(TOKEN):
                 gif1 = Gif(get_last(message),auto_download=True)
                 message.content = message.content.split(" ")[1]
                 if gif_is_sent(message) != None:
-                    if gif1.is_same_gif(gif_is_sent(message)):
+                    gif2 = Gif(gif_is_sent(message),auto_download=True)
+                    # print(gif1.frames[0])
+                    # print(gif2.frames[0])
+                    if gif1.is_same_caption_gif(gif2.img):
                         await message.channel.send("These gifs are the same")
                     else:
                         await message.channel.send("These gifs are not the same")

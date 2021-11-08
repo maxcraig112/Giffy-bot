@@ -41,6 +41,8 @@ CHECK THAT PIXEL 0,0 OF FIRST AND SECOND FRAME REMAINS CONSTANT
 - method for downloading all archived gifs (DONE)
 - convert all cnd.discordapp.com to media.discordapp.net urls in json (DONE)
 - fix tagging system so that more words are included (a lot of tags in the dictionary isn't that bad since O(1) complexity) (DONE)
+- bot can now compare text of 2 caption gifs and return whether they are 80% the same sequence
+- bot can return whether or not it thinks 2 gifs are the same (caption and all)
 
 # TODO:
 - fix problems where it thinks certain white caption gifs are gifs, and where it thinks some caption gifs aren't gifs
