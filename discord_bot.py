@@ -110,6 +110,8 @@ def run_bot(TOKEN):
     @client.event
     async def on_ready():
         print("Bot is ready")
+        activity = discord.Activity(type=discord.ActivityType.watching, name="for any gifs")
+        await client.change_presence(status=discord.Status.online,activity=activity)
 
     @client.event
     async def on_message(message):
@@ -512,5 +514,6 @@ if __name__ == "__main__":
     
     TOKEN = "ODkzMjkzMDc0NDEzOTE2MjMw.YVZWAQ.ThvEfXAcwD36XF9uedCWydq8D-c"
     run_bot(TOKEN)
+    #https://discord.com/api/oauth2/authorize?client_id=893293074413916230&permissions=36768320&scope=bot
     #https://discord.com/api/oauth2/authorize?client_id=893293074413916230&permissions=8&scope=bot
     #https://discordpy.readthedocs.io/en/stable/api.html#
