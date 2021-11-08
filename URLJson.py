@@ -148,7 +148,9 @@ class Tagger:
         tokens = word_tokenize(text)
         alltags = nltk.pos_tag(tokens)
         #get stop words
-        stop_words = set(stopwords.words("english"))
+        #stop_words = set(stopwords.words("english"))
+        stop_words = ['him', 'only', 'been', 'on', 'such', 'isn', 'were', "wasn't", 'hadn', 've', 'shouldn', 'those', 'other', 'not', "won't", 'hasn', "doesn't", 'over', "didn't", 'below', 'now', 'after', 'is', "she's", 'each', 'this', 'what', "needn't", 'your', 'theirs', 'doesn', 'wasn', 'couldn', 'which', 'do', 'their', 'll', 'at', 'to', "that'll", "isn't", 'in', 'and', "don't", 'ain', 'weren', 'myself', 'most', "couldn't", 'yourselves', "mightn't", 'further', "shouldn't", 'can', 'before', 'he', "mustn't", 'should', "hasn't", 'a', 'or', 'of', 'won', 'nor', 'hers', 's', 'them', 'aren', 'by', 'mightn', 'herself', 'she', "you're", 'it', 'about', "should've", 'all', 'have', 'both', "hadn't", 'between', 'itself', 'for', "weren't", 'above', "shan't", 'while', 'under', 'down', 'there', 'ma', 'our', 'am', 'has', 'because', 'when', 't', 'does', 'where', 'then', 'very', 'why', 'any', 'mustn', 'some', 'himself', 'out', 'whom', 'who', 'if', 'm', 'don', 're', 'the', 'so', 'his', 'wouldn', "you'd", "aren't", 'until', 'an', 'we', 'off', 'themselves', 'me', 'did', 'had', 'you', "you'll", 'against', 'through', 'again', 'will', 'how', "haven't", 'needn', 'that', "wouldn't", 'haven', 'with', "it's", 'from', 'too', 'its', 'i', 'more', 'are', 'be', 'didn', "you've", 'but', 'they', 'as', 'o', 'was', 'these', 'here', 'than', 'y', 'up', 'few', 'yourself', 'shan', 'her', 'once', 'my', 'own', 'ourselves', 'same', 'yours', 'into', 'ours', 'd', 'just', 'no']
+        #stop_words = ""
         #print(alltags)
         sub_tags = []
         #remove all tags that are stop_words
@@ -170,7 +172,7 @@ class Tagger:
 
 
 if __name__ == "__main__":
-   tag = Tagger("Me going to the among us festival (a doctor told me to seek professional help because i have 122 'imposter syndrome') ")
+   tag = Tagger("max building essential highway infrastructure for the working class (they need fo commute to the CED) (Central Emerald District) while his entire team fails to defend the bed (they are very bad)")
    print(tag.tags)
     # captiongifs = JsonCaptionGifs("test.json")
     # captiongifs.set_catagory("global")
