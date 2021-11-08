@@ -437,38 +437,67 @@ def run_bot(TOKEN):
                 """
                 scrapes all unique valid gif urls sent in channel 
                 """
+                start = timeit.default_timer()
                 await message.channel.send("Attempting to scrape all unique gif urls from channel, this may take a while!")
                 channel = client.get_channel(message.channel.id)
                 messages = await channel.history(limit=None,oldest_first = True).flatten()
-                gif_urls = []
+                gif_urls = {}
                 for i in messages:
                     url = gif_is_sent(i)
                     if url != None and url not in gif_urls:
-                        gif_urls += [url]
+                        gif_urls[url] = 0
                 with open(f"{message.channel.id}_scrape.txt","w") as f:
                     for i in gif_urls:
                         f.write(f"{i}\n")
                 await message.channel.send(f"{len(gif_urls)} unique gif urls successfully scraped",file=discord.File(f"{message.channel.id}_scrape.txt"))
                 os.remove(f"{message.channel.id}_scrape.txt")
+                print(timeit.default_timer()-start)
             if msg == ".scrapeall":
                 """
                 scrapes all unique valid gif urls sent in server
                 """
+                start = timeit.default_timer()
                 await message.channel.send("Attempting to scrape all unique gif urls from server, this may take a while!")
                 ids = [message.guild.text_channels[i].id for i in range(len(message.guild.text_channels))]
-                gif_urls = []
+                gif_urls = {}
                 for channels in ids:
                     channel = client.get_channel(channels)
                     messages = await channel.history(limit=None,oldest_first = True).flatten()
                     for msg in messages:
                         url = gif_is_sent(msg)
                         if url != None and url not in gif_urls:
-                            gif_urls += [url]
+                            gif_urls[url] = 0
+                print(timeit.default_timer()-start)
                 with open(f"{message.guild.id}_fullscrape.txt", "w") as f:
                     for i in gif_urls:
                         f.write(f"{i}\n")
                 await message.channel.send(f"{len(gif_urls)} unique gif urls successfully scraped",file=discord.File(f"{message.guild.id}_fullscrape.txt"))
                 os.remove(f"{message.guild.id}_fullscrape.txt")
+            if msg ==".scrapeallx":
+                """
+                scrapes all unique valid gif urls sent in every server the bot is in (for my use only)
+                """
+                start = timeit.default_timer()
+                await message.channel.send("Attempting to scrape all unique gif urls from all servers, this is literally going to take forever")
+                text_channel_list = []
+                for guild in client.guilds:
+                    for channel in guild.text_channels:
+                        text_channel_list += [channel.id]
+                #print(text_channel_list)
+                gif_urls = {}
+                for channels in text_channel_list:
+                    channel = client.get_channel(channels)
+                    messages = await channel.history(limit=None,oldest_first = True).flatten()
+                    for msg in messages:
+                        url = gif_is_sent(msg)
+                        if url != None and url not in gif_urls:
+                            gif_urls[url] = 0
+                print(timeit.default_timer()-start)
+                with open("full_gif_scrape.txt", "w") as f:
+                    for i in gif_urls:
+                        f.write(f"{i}\n")
+                await message.channel.send(f"{len(gif_urls)} unique gif urls successfully scraped",file=discord.File("full_gif_scrape.txt"))
+                os.remove("full_gif_scrape.txt")
             if gif_is_sent(message) != None:
                 #create URLAttachment Object containing url location data
                 url = AttachmentURL(gif_is_sent(message),message.guild.id,message.channel.id,message.author.id)
