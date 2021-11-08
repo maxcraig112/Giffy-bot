@@ -1,4 +1,5 @@
 from enum import auto
+import PIL
 from bs4 import *
 from io import BytesIO, StringIO
 import os
@@ -46,8 +47,11 @@ class Gif:
         """
         try:
             if type(img) != str:
+                if type(img) == PIL.GifImagePlugin.GifImageFile:
+                    self.img = img
+                if type(img) == Gif:
+                    self.img = img.img
                 #image_path must already be in Object form
-                self.img = img
                 self.frames = self._get_frames()
                 self.durations = self._get_duration()
                 self._update_size()
@@ -411,7 +415,7 @@ class Gif:
             var_dif = round(mean([round(stats1[4][i]/stats2[4][i],2) for i in range(3)]),2)
             std_dif = round(mean([round(stats1[5][i]/stats2[5][i],2) for i in range(3)]),2)
             dif = [ratio_dif,mean_dif,median_dif,rms_dif,var_dif,std_dif]
-            
+
             return dif
         else:
             #could not parse img_reference
@@ -470,36 +474,6 @@ class Gif:
         if boundary is not None:
             self.get_top_caption().show()
     #endregion
-
-def save_all_gifs(file_name,json_file):
-    """
-    From a specified json_file, downloads all gifs url within the "global" subdictionary, and stores them in the designated file
-    """
-    with open(file_name, "w") as f:
-        gifs_json = JsonGifs(json_file)
-        gifs_json.set_catagory("global")
-        print("Number of gifs: " + str(len(gifs_json.subdict)))
-        start = timeit.default_timer()
-        for i in gifs_json.subdict:
-            f.write(f"{i}\n")
-        print("Time taken: " + str(round(timeit.default_timer() - start,2)))
-
-def convert_gifs(file_name):
-    """
-    given a file of gif urls, replaces all cdn.discordapp.com url prefixes with media.discordapp.com, and removes any duplicates
-    """
-    old_urls = []
-    with open(file_name,"r") as f:
-        old_urls = f.readlines()
-    new_urls = []
-    for i in old_urls:
-        if i[:26] == "https://cdn.discordapp.com":
-            i = "https://media.discordapp.net" + i[26:]
-        if i not in new_urls:
-            new_urls += [i]
-    with open(file_name, "w") as f:
-        for i in new_urls:
-            f.write(f"{i}")
         
     
 if __name__ == "__main__":
@@ -508,9 +482,7 @@ if __name__ == "__main__":
     # img.save("test.gif")
     # img.resize(0.5)
     # img.save("test2.gif")
-    
-    #save_all_gifs("All gifs/all_regular_gifs.txt","Json/archivedgifs.json")
-    #convert_gifs("All gifs/all_regular_gifs.txt")
-    img = Gif("https://cdn.discordapp.com/attachments/712243005519560736/907062523751190548/712243005519560736_470896999722516480.gif")
+    img = Gif("https://cdn.discordapp.com/attachments/712243005519560736/907062523751190548/712243005519560736_470896999722516480.gif",auto_download=True)
+    print(type(img.img)==PIL.GifImagePlugin.GifImageFile)
     print(img.stats_dif("https://cdn.discordapp.com/attachments/712243005519560736/907062478884712488/712243005519560736_470896999722516480.gif"))
     pass
