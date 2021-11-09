@@ -1,7 +1,7 @@
 import re
 
-def extract():
-    file = open("gif.txt","r+")
+def extract(source_file,desination_file):
+    file = open(source_file,"r")
     contents = file.read()
     print (contents)
 
@@ -13,11 +13,11 @@ def extract():
     print (pattern)
     urls = pattern.finditer(contents)
 
-    wfile = open("cleangif2.log","w")
+    wfile = open(desination_file,"w")
     first = True
     #urlCount = 0
     for url in urls:
-        print (url.group(1))
+        #print (url.group(1))
         if first == True:
             wfile.write(url.group(1))
             first = False
@@ -31,7 +31,7 @@ def extract():
     file.close()
 
 def prefix_gif():
-    file = open("cleangif.txt")
+    file = open("tonigif.txt")
     unique = []
     for url in file:
         prefix = url[8:].split('/',1)[0]
@@ -40,4 +40,5 @@ def prefix_gif():
     return unique
         
 if __name__ == "__main__":
-    extract()
+    extract("max_gif_raw.txt","maxgifs.txt")
+    extract("taine_gif_raw.txt","tainegifs.txt")
