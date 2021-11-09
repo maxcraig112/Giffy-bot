@@ -439,13 +439,14 @@ def run_bot(TOKEN):
                 """
                 start = timeit.default_timer()
                 await message.channel.send("Attempting to scrape all unique gif urls from channel, this may take a while!")
+                metadata = [message.guild.id,message.channel.id]
                 channel = client.get_channel(message.channel.id)
                 messages = await channel.history(limit=None,oldest_first = True).flatten()
-                gif_urls = {}
+                gif_urls = []
                 for i in messages:
                     url = gif_is_sent(i)
                     if url != None and url not in gif_urls:
-                        gif_urls[url] = 0
+                        gif_urls += [[url] + metadata + [i.author.id]]
                 with open(f"{message.channel.id}_scrape.txt","w") as f:
                     for i in gif_urls:
                         f.write(f"{i}\n")
@@ -454,19 +455,19 @@ def run_bot(TOKEN):
                 print(timeit.default_timer()-start)
             if msg == ".scrapeall":
                 """
-                scrapes all unique valid gif urls sent in server
+                scrapes all unique valid gif urls sent in server, while including attachment metadata
                 """
                 start = timeit.default_timer()
                 await message.channel.send("Attempting to scrape all unique gif urls from server, this may take a while!")
                 ids = [message.guild.text_channels[i].id for i in range(len(message.guild.text_channels))]
-                gif_urls = {}
+                gif_urls = []
                 for channels in ids:
                     channel = client.get_channel(channels)
                     messages = await channel.history(limit=None,oldest_first = True).flatten()
                     for msg in messages:
                         url = gif_is_sent(msg)
                         if url != None and url not in gif_urls:
-                            gif_urls[url] = 0
+                            gif_urls += [[url,message.guild.id,channels,msg.author.id]]
                 print(timeit.default_timer()-start)
                 with open(f"{message.guild.id}_fullscrape.txt", "w") as f:
                     for i in gif_urls:
