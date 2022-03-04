@@ -21,6 +21,8 @@ import timeit
 from difflib import SequenceMatcher
 import ast
 
+from gif import *
+
 def save_all_gifs(file_name,json_file,store_metadata=True):
     """
     From a specified json_file, downloads all gifs url within the "global" subdictionary and it's attachment metadata, and stores them in the designated file
@@ -56,20 +58,97 @@ def convert_gifs(file_name):
         for i in new_urls:
             f.write(f"{i}\n")
 
-def process_url(url, caption_json, uncaption_json, tags_json):
+def process_url(url_data, caption_json_file, uncaption_json_file, tags_json_file):
     """
     given a url directory, downloads the image, processing it, obtaining it's metadata, and storing it in it's respective json file if it isn't already in the file.
     """
-    pass
+    #instantiate Gif object
+    #open respective json
+    
+    #if gif exists in global, don't download meta data, otherwise do, and add to global
+    #if gif exists in guild, don't download meta data, otherwise do, and add to guild
+    #if gif exists in user, don't download meta data, otherwise do, and add to user
+    # FOR THESE 3 STEPS: only download meta data once
+    try:
+        url = AttachmentURL(url_data[0],url_data[1],url_data[2],url_data[3])
+        #instantiate gif object
+        gif = Gif(url.url,auto_download=True)
+        if gif._get_image(gif.img_reference):
+            metadata = [url.guildID,url.channelID,url.userID]
+            #if gif is a caption gif
+            if gif.is_caption_gif():
+                caption = gif.text_from_caption() #get caption
+                tags = Tagger(caption).tags #get tags
+                stats = gif.stats()
+                metadata += [caption,tags,stats]
+                #await message.channel.send(tags)
+                tags_json = JsonGifs(tags_json_file)
+                for tag in tags:
+                    tags_json.set_catagory('global')
+                    tags_json.addsubKey(tag)
+                    if not tags_json.contains(url.url,subkey=tag):
+                        tags_json.add(url.url,metadata[:-3],tag)
+                    tags_json.set_catagory('guild')
+                    tags_json.addsubKey(url.guildID)
+                    tags_json.addsubsubKey(url.guildID,tag)
+                    if not tags_json.contains(url.url,url.guildID,tag):
+                        tags_json.add(url.url,metadata[:-3],url.guildID,tag)
+                    tags_json.set_catagory('user')
+                    tags_json.addsubKey(url.userID)
+                    tags_json.addsubsubKey(url.userID,tag)
+                    if not tags_json.contains(url.url,url.userID,tag):
+                        tags_json.add(url.url,metadata[:-3],url.userID,tag)
+                tags_json.dump_json()
 
+            #instantiate json archiving object, file open depends on whether gif contains a caption
+            archives = JsonGifs(caption_json_file if gif.is_caption_gif() else uncaption_json_file,"global")
+            if not archives.contains(url):
+                archives.add(url.url,metadata) #add url to global key
+            #print(archives.contains_alt_url(url))
+            archives.set_catagory("guild") #set catagory to guild key
+            
+            archives.addsubKey(url.guildID) #if server ID not in guild key, add, then add url to server ID
+            if not archives.contains(url.url,url.guildID):
+                archives.add(url.url,None,url.guildID)
+            #print(archives.contains_alt_url(url,url.guildID))
+            archives.set_catagory("user") #if user ID not in user key, add, then add url to user ID
+            
+            archives.addsubKey(url.userID)
+            if not archives.contains(url.url,url.userID):
+                archives.add(url.url,None,url.userID)
+            #print(archives.contains_alt_url(url,url.userID))
+            archives.dump_json() #save json file
+            return None
+    except:
+        print(url_data[0])
+        return url_data
 
 if __name__ == "__main__":
-    save_all_gifs("All gifs/all_regular_gifs.txt","Json/archivedgifs.json")
-    save_all_gifs("All gifs/all_caption_gifs.txt","Json/archivedcaptiongifs.json")
-    convert_gifs("All gifs/all_regular_gifs.txt")
-    convert_gifs("All gifs/all_caption_gifs.txt")
+    # save_all_gifs("All gifs/all_regular_gifs.txt","Json/archivedgifs.json")
+    # save_all_gifs("All gifs/all_caption_gifs.txt","Json/archivedcaptiongifs.json")
+    # convert_gifs("All gifs/all_regular_gifs.txt")
+    # convert_gifs("All gifs/all_caption_gifs.txt")
     
+    """
+    caption_gifs = []
+    with open("All gifs/master_gif_file.txt","r") as f:
+        caption_gifs = f.readlines()
+    for i in range(len(caption_gifs)):
+        caption_gifs[i] = ast.literal_eval(caption_gifs[i])
+
+    failed_gifs = []
+    for i in range(3827,len(caption_gifs)):
+        #print(caption_gifs[i])
+        print(f"{i}/{len(caption_gifs)}")
+        gif = process_url(caption_gifs[i],"testjson/archivedcaptiongifs.json","testjson/archivedgifs.json","testjson/tags.json")
+        if gif != None:
+            failed_gifs += [gif]
     
+    print("ITS FUCKING DONE, POG POG POG POG POG POG")
+    with open("failed_gifs.txt","w") as f:
+        for i in failed_gifs:
+            f.write(f"{i}\n")
+    """
     # f = open("All gifs/maxgifs.txt","r")
     # g = open("All gifs/tainegifs.txt","r")
     # gif1 = f.readlines()
@@ -82,7 +161,4 @@ if __name__ == "__main__":
     # with open("All gifs/maxtainegifs.txt","w") as h:
     #     for i in combined:
     #         h.write(f"{i}\n")
-
-
-
-    pass
+    

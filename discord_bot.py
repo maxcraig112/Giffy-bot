@@ -3,6 +3,7 @@ import os
 import random
 from re import M, search
 from typing import Dict
+from numpy import true_divide
 
 from numpy.lib.function_base import median
 from gif import Gif
@@ -10,6 +11,7 @@ from validators.url import url
 import discord
 import validators
 from discord.ext import commands
+from discord.ui import Button, View
 from URLJson import *
 import timeit
 from copy import copy
@@ -29,6 +31,16 @@ def run_bot(TOKEN):
                     return gif
                 except KeyError:
                     return None
+
+    def get_last_search(search_ID,guild_ID,channel_ID,user_ID):
+        #get the last search which was posted in scope by user
+        with open("Json/lastsearch.json", "r") as f:
+            dict = json.load(f)
+            try:
+                search_data = dict[guild_ID][channel_ID][user_ID]
+                return search_data
+            except KeyError:
+                return None
 
     async def no_gif_found(message):
         await message.channel.send("No previous gifs found in channel. This may be because I haven't been in the server long or I was offline when a gif was sent!")
@@ -52,6 +64,19 @@ def run_bot(TOKEN):
             return message.content
         return None
 
+    def last_search_json(search_ids: str,guild_id: str,channel_id: str,user_id: str,gifs: list,index: int):
+        f = open("Json/lastsearch.json","r")
+        dict = json.load(f)
+        if guild_id not in dict:    #if json database does not have key for current server
+            dict[guild_id] = {}     #add current server to json database
+        
+        if channel_id not in dict[guild_id]: #if json database does not have key for current channel
+            dict[guild_id][channel_id] = {} #add current channel to json database
+        #add url to key of channel.id. whether or not it exists, it will be created or placed there
+        dict[guild_id][channel_id][str(user_id)] = {"search_id": search_ids, "gifs": gifs, "index": index}
+        with open("Json/lastsearch.json","w") as fw:
+            json.dump(dict, fw, indent=4)
+    
     def last_gif_json(url):
         f = open("Json/lastgif.json","r")
         dict = json.load(f)
@@ -120,7 +145,34 @@ def run_bot(TOKEN):
             # if msg == "vore":
             #     await message.channel.send("<@217233850101661697>referenced the forbidden word 'vore', breaking a streak of 0 hour, 0 minutes, and 0 seconds. I'll wait 30 minutes and 0 seconds before warning you for this word again." )
             if msg == ".test":
-                await message.channel.send("hello\nhow\nare\nyou")
+                gifs = ["https://media.discordapp.net/attachments/712243005519560736/947711699706855474/712243005519560736_470896999722516480.gif","https://tenor.com/view/burrito-pass-peepohappy-gif-18706235","https://media.discordapp.net/attachments/690819748929470475/923615350677991445/rhfp8exd29781.gif"]
+                i = 0
+
+                async def prev_gif_callback(interaction):
+                    await interaction.response.send_message("previous gif")
+
+                async def next_gif_callback(interaction):
+                    await interaction.response.send_message("next gif")
+                prev_button = Button(label='Previous Gif',custom_id='prev_gif',style=discord.ButtonStyle.blurple)
+                next_button = Button(label='Next Gif',custom_id='next_gif',style=discord.ButtonStyle.blurple)
+                prev_button.callback = prev_gif_callback
+                next_button.callback = next_gif_callback
+                view = View(prev_button,next_button)
+                button_msg = await message.channel.send(view=view)
+
+                # interaction, button = await client.wait_for('button_click')
+                # button_id = button.custom_id
+
+                # def change_index(button,i,gifs):
+                #     if button == "prev_gif":
+                #         i = i - 1 if i != 0 else len(gifs) - 1
+                #     if button == "next_gif":
+                #         i = (i + 1) % len(gifs)
+                #     return i
+
+                # #await interaction.defer()
+                # i = change_index(button_id,i,gifs)
+                # await interaction.edit(content=gifs[i])
             if msg == ".cgif":
                 gif = Gif(get_last(message),auto_download=True)
                 #gif._get_image(gif.img_reference)
@@ -219,7 +271,87 @@ def run_bot(TOKEN):
                 if len(urls) > 0:
                     scores, urls = zip(*sorted(zip(scores,urls),reverse=True))
                     #print(urls,scores)
-                    txt = f"It took {int(timeit.default_timer() - start_time)} seconds to search through {size} tags, out of {len(urls)} results, here are the top {min(len(urls),6)} i found! "
+                    txt = f"It took {int(timeit.default_timer() - start_time)} seconds to search through {size} tags, out of those, there were {len(urls)} urls that matched your search!"
+                    #await message.channel.send(txt)
+                    if (len(urls) == 1):
+                        txt = "1 result"
+                    else:
+                        txt = f"{len(urls)} results"
+                    await message.channel.send(txt)
+                    i = 0
+                    async def prev_gif_callback(interaction):
+                        #get ID of search interaction
+                        search_ID = interaction.data["custom_id"][:-1]
+                        #get last search made by that user in scope
+                        search_data = get_last_search(search_ID,str(interaction.guild_id),str(interaction.channel_id),str(interaction.user))
+                        #print(search_data)
+                        if search_data is not None:
+                            #if IDs do not match, search has expired, delete
+                            if search_data["search_id"] != search_ID:
+                                await interaction.response.edit_message(content="This search has expired, searches are currently limited to 1 person per channel", delete_after=5)
+                            else:
+                                #otherwise, get gifs, get index
+                                gifs, i = search_data["gifs"], search_data["index"]
+                                i = i - 1 if i != 0 else len(urls) - 1
+                                await interaction.response.edit_message(content=gifs[i],view=view)
+                                #dump new values into json
+                                last_search_json(str(search_ID),str(interaction.guild_id),str(interaction.channel_id),str(interaction.user),gifs,i)
+                                #decrement index
+
+                                #await interaction.response.send_message("previous gif")
+
+                    async def next_gif_callback(interaction):
+                        #get ID of search interaction
+                        search_ID = interaction.data["custom_id"][:-1]
+                        #get last search made by that user in scope
+                        search_data = get_last_search(search_ID,str(interaction.guild_id),str(interaction.channel_id),str(interaction.user))
+                        #print(search_data)
+                        if search_data is not None:
+                            #if IDs do not match, search has expired, delete
+                            if search_data["search_id"] != search_ID:
+                                await interaction.response.edit_message(content="This search has expired, searches are currently limited to 1 person per channel", delete_after=5)
+                            else:
+                                #otherwise, get gifs, get index
+                                gifs, i = search_data["gifs"], search_data["index"]
+                                i = (i + 1) % len(urls)
+                                await interaction.response.edit_message(content=gifs[i],view=view)
+                                #dump new values into json
+                                last_search_json(str(search_ID),str(interaction.guild_id),str(interaction.channel_id),str(interaction.user),gifs,i)
+                                #decrement index
+
+                            #await interaction.response.send_message("previous gif")
+                    prev_button = Button(label='Previous Gif',custom_id='prev_gif',style=discord.ButtonStyle.blurple)
+                    next_button = Button(label='Next Gif',custom_id='next_gif',style=discord.ButtonStyle.blurple)
+                    view = View(prev_button,next_button)
+                    prev_button.custom_id = view.id + "0"
+                    next_button.custom_id = view.id + "1"
+                    prev_button.callback = prev_gif_callback
+                    next_button.callback = next_gif_callback
+                    print(view.id)
+                    button_msg = await message.channel.send(content=urls[i],view=view)
+                    #store search made by that user in that channel in that server to json
+                    last_search_json(str(view.id),str(message.guild.id),str(message.channel.id),str(message.author),urls,0)
+                    while(True):
+                        interaction, button = await client.wait_for('button_click')
+                        if (button_msg.id == interaction.message_id):
+                            def response(button,i,urls):
+                                res = ""
+                                if button == "prev_gif":
+                                    i = i - 1 if i != 0 else len(urls) - 1
+                                    res = urls[i]
+                                if button == "next_gif":
+                                    i = (i + 1) % len(urls)
+                                    res = urls[i]
+                                if button == "rem_gif":
+                                    res = "Feature currently not implemented!"
+                                return res,i
+
+
+
+                            #await interaction.defer()
+                            res, i = response(button,i,urls)
+                            await interaction.edit(content=res)
+                    """
                     for i in range(min(6,len(urls))):
                         #print 5 highest scoring gifs
                         txt += f"{urls[i]}\n"
@@ -227,6 +359,7 @@ def run_bot(TOKEN):
                     await message.channel.send(txt[:-1])
                     u = AttachmentURL(urls[min(len(urls)-1,4)],message.guild.id,message.channel.id,message.author.id)
                     last_gif_json(u)
+                    """
                 else:
                     await message.channel.send("sorry! no caption gifs with those tags can be found!")
             if msg[:8] == ".asearch":
@@ -511,6 +644,9 @@ def run_bot(TOKEN):
         except Exception as e:
             await message.channel.send(f"{e}, Oops! Something went wrong!")
     
+    @client.event
+    async def on_component(message):
+        print("PUSH")
     client.run(TOKEN)
 if __name__ == "__main__":
     # gifs = []
@@ -523,7 +659,7 @@ if __name__ == "__main__":
     # failed_gifs = []
     # for i in range(1063,len(gifs)):
     #     try:
-    #         print(f"{i}/{len(gifs)}")
+    #         ^
     #         url = AttachmentURL(gifs[i].strip(),guildID,channelID,userID)
     #         #instantiate gif object
     #         gif = Gif(url.url,auto_download=True)

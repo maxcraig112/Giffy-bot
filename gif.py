@@ -395,7 +395,7 @@ class Gif:
         if boundary != None:
             assert boundary[2] <= gif.size[0] and boundary[3] <= gif.size[1]
             gif = gif.crop(boundary)
-        gif.show()
+        #gif.show()
         x = Stat(gif).mean
         ratio = [round(gif.size[0]/gif.size[1],2)]
         mean = [round(Stat(gif).mean[i],2) for i in range(min(len(Stat(gif).mean),3))]
@@ -489,10 +489,11 @@ if __name__ == "__main__":
     # img.save("test.gif")
     # img.resize(0.5)
     # img.save("test2.gif")
-    img = Gif("Tester Files/test4.gif",auto_download=True)
-    print(img.stats(decaption=False))
-    print(img.stats(decaption=False,frame=1))
-    pass
+    # img = Gif("Tester Files/test4.gif",auto_download=True)
+    # print(img.stats(decaption=False))
+    # print(img.stats(decaption=False,frame=1))
+    img = Gif("https://media.discordapp.net/attachments/869864347449577512/905769617945935902/869864347449577512_741169124817764372.gif",auto_download=True)
+    
 
     #get image file of frame[0]
     #get image file of frames[1]

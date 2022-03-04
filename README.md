@@ -63,3 +63,21 @@ CHECK THAT PIXEL 0,0 OF FIRST AND SECOND FRAME REMAINS CONSTANT
 - refine stop_words list so that some words aren't removed
 - if .rgif or .rcgif are used, don't try and process those gifs
 - program for scraping urls from a channel using channel.history
+
+# TODO BEFORE MASS REPROCESSESSING
+- made it such that global tags hold data for all servers and users that have sent a gif
+- actually figure out a robust way to find the caption of white gifs, and every gif 
+
+
+ - https://discordpy-message-components.readthedocs.io/en/latest/
+ - https://pypi.org/project/discord.py-message-components/
+ - https://pypi.org/project/discord-components/
+ - https://stackoverflow.com/questions/67722188/add-button-components-to-a-message-discord-py
+
+
+
+# HOW TO MAKE BUTTON INTERACTIONS
+- everytime you search in a channel, store that message result interaction ID in a json, similar to last gif
+- when interaction is triggered, pull that ID with the list of gif results stored and increment
+- only allowed 1 per channel?? just to avoid clogging up everything
+- only person who searches can interact with buttons?
