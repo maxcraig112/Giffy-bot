@@ -4,21 +4,31 @@ A multipurpose repos designed to allow the de-captioning and tagging of gifs, as
 The repos provides abstraction of these commands through the discord bot Giffy
 
 
-# Current list of Bot Commands
-- decaption a caption gif
-- return text in a gif
-- store last gif posted to server
-- create caption gifs
-- store all unique gifs sent 
-    - Globally
-    - in each guild
-    - by each user
-- Tags all caption gifs according to the
-    - Nouns
-    - Adjectives
-    - Verbs
-- contained within their caption
-- Allows the searching of gifs through these tags
+## Current list of Bot Commands
+| First Header  | Second Header |
+| ------------- | ------------- |
+| Content Cell  | Content Cell  |
+| Content Cell  | Content Cell  |
+| Content Cell  | Content Cell  |
+| Content Cell  | Content Cell  |
+| Content Cell  | Content Cell  |
+| Content Cell  | Content Cell  |
+| Content Cell  | Content Cell  |
+| Content Cell  | Content Cell  |
+| Content Cell  | Content Cell  |
+| Content Cell  | Content Cell  |
+| Content Cell  | Content Cell  |
+| Content Cell  | Content Cell  |
+| Content Cell  | Content Cell  |
+| Content Cell  | Content Cell  |
+| Content Cell  | Content Cell  |
+| Content Cell  | Content Cell  |
+| Content Cell  | Content Cell  |
+| Content Cell  | Content Cell  |
+| Content Cell  | Content Cell  |
+| Content Cell  | Content Cell  |
+| Content Cell  | Content Cell  |
+| Content Cell  | Content Cell  |
 
 Aims of the bot
 - Scraping caption gifs off tenor using API
