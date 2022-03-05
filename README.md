@@ -16,6 +16,8 @@ The repos provides abstraction of these commands through the discord bot Giffy
 | .resize [factor] | Content Cell  |
 
 ### Image Statistics
+| Command  | Description |
+| ------------- | ------------- |
 | .cgif  | Content Cell  |
 | .text  | Content Cell  |
 | .tags  | Content Cell  |
@@ -24,20 +26,28 @@ The repos provides abstraction of these commands through the discord bot Giffy
 | .sgif [gif]  | Content Cell  |
 
 ### Gif Searching
+| Command  | Description |
+| ------------- | ------------- |
 | .search [tag1,tag2,...]  | Content Cell  |
 | .asearch [tag1,tag2,...]  | Content Cell  |
 
 ### Gif Retrieval
+| Command  | Description |
+| ------------- | ------------- |
 | .lgif  | Content Cell  |
 | .rgif  | Content Cell  |
 | .rcgif  | Content Cell  |
 
 ### Gif Scraping
+| Command  | Description |
+| ------------- | ------------- |
 | .scrape  | Content Cell  |
 | .scrapeall  | Content Cell  |
 | .scrapeallx  | Content Cell  |
 
 ### Debugging Tool
+| Command  | Description |
+| ------------- | ------------- |
 | .test  | Content Cell  |
 
 Aims of the bot
