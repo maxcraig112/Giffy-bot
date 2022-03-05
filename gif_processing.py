@@ -149,7 +149,7 @@ if __name__ == "__main__":
         caption_gifs[i] = ast.literal_eval(caption_gifs[i])
 
     failed_gifs = []
-    for i in range(len(caption_gifs)):
+    for i in range(530,len(caption_gifs)):
         #print(caption_gifs[i])
         print(f"{i}/{len(caption_gifs)}")
         gif = process_url(caption_gifs[i],"testjson/archivedcaptiongifs.json","testjson/archivedgifs.json","testjson/tags.json")

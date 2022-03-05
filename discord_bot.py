@@ -144,8 +144,6 @@ def run_bot(TOKEN):
     async def on_message(message):
         msg = message.content.lower()
         try:
-            # if msg == "vore":
-            #     await message.channel.send("<@217233850101661697>referenced the forbidden word 'vore', breaking a streak of 0 hour, 0 minutes, and 0 seconds. I'll wait 30 minutes and 0 seconds before warning you for this word again." )
             if msg == ".test":
                 gifs = ["https://media.discordapp.net/attachments/712243005519560736/947711699706855474/712243005519560736_470896999722516480.gif","https://tenor.com/view/burrito-pass-peepohappy-gif-18706235","https://media.discordapp.net/attachments/690819748929470475/923615350677991445/rhfp8exd29781.gif"]
                 i = 0
@@ -181,8 +179,6 @@ def run_bot(TOKEN):
                         await message.channel.send(i)
                         break
                     count += 1
-                # gif = random.choice(os.listdir("All gifs/downloaded_gifs"))
-                # await message.channel.send(file=discord.File(f"All gifs/downloaded_gifs/{gif}"))
             if msg == ".rcgif":
                 # open archived gifs, get random url from global
                 archive = JsonGifs("Json/archivedcaptiongifs.json","global")
@@ -494,11 +490,12 @@ def run_bot(TOKEN):
                         await resize_and_send(gif, message)
                     else:
                         await no_gif_found(message)
-            if msg == ".speed":
+            if msg.split(" ")[0] == ".speed":
+                factor = float(msg.split(" ")[1])
                 gif = Gif(get_last(message),auto_download=True)
                 if gif.img != None:
                     await message.channel.send("speeding up gif!")
-                    gif.change_speed()
+                    gif.change_speed(factor=factor)
                     await resize_and_send(gif, message)
                 else:
                     await no_gif_found(message)
@@ -696,8 +693,8 @@ if __name__ == "__main__":
     # else:
     #     print(gifs[i])
     #     failed_gifs += [gifs[i]]
-    
-    TOKEN = "ODkzMjkzMDc0NDEzOTE2MjMw.YVZWAQ.ThvEfXAcwD36XF9uedCWydq8D-c"
+    with open('C:/Users/maxcr/Desktop/Executables/giffytoken.txt') as f:
+        TOKEN = f.readline()
     run_bot(TOKEN)
     #https://discord.com/api/oauth2/authorize?client_id=893293074413916230&permissions=36768320&scope=bot
     #https://discord.com/api/oauth2/authorize?client_id=893293074413916230&permissions=8&scope=bot

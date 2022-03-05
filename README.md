@@ -1,7 +1,7 @@
 # Giffy-Bot
-A multipurpose repos designed to allow the de-captioning and tagging of gifs, as well as other functionality to do with the catagorising, archiving and searching of gifs.
+A multipurpose repos designed to allow the manipulation, tagging, archiving and retrieval of gifs.
 
-The repos provides abstraction of these commands through the discord bot Giffy
+This repos provides abstraction of these commands through the discord bot Giffy.
 
 
 ## Current list of Bot Commands

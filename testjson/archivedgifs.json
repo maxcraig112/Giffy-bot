@@ -29,6 +29,16 @@
             "470896999722516480",
             "712243005519560736",
             "158878635766317056"
+        ],
+        "https://c.tenor.com/NII4cFF4LIQAAAAd/group-texts-group-chats.gif": [
+            "470896999722516480",
+            "712243005519560736",
+            "158878635766317056"
+        ],
+        "https://c.tenor.com/PhhN-3LjE3AAAAAd/gatto-cibo.gif": [
+            "470896999722516480",
+            "712243005519560736",
+            "158878635766317056"
         ]
     },
     "guild": {
@@ -38,7 +48,9 @@
             "https://media.discordapp.net/attachments/712243005519560736/837596569699745792/caption.gif": null,
             "https://media.discordapp.net/attachments/712243005519560736/837592872340684810/caption.gif": null,
             "https://media.discordapp.net/attachments/262067534482767872/807331042662285322/cool_chicken.gif": null,
-            "https://media.discordapp.net/attachments/861429532234219540/867978603508428821/image0.gif": null
+            "https://media.discordapp.net/attachments/861429532234219540/867978603508428821/image0.gif": null,
+            "https://c.tenor.com/NII4cFF4LIQAAAAd/group-texts-group-chats.gif": null,
+            "https://c.tenor.com/PhhN-3LjE3AAAAAd/gatto-cibo.gif": null
         }
     },
     "user": {
@@ -50,7 +62,9 @@
             "https://media.discordapp.net/attachments/262067534482767872/807331042662285322/cool_chicken.gif": null
         },
         "158878635766317056": {
-            "https://media.discordapp.net/attachments/861429532234219540/867978603508428821/image0.gif": null
+            "https://media.discordapp.net/attachments/861429532234219540/867978603508428821/image0.gif": null,
+            "https://c.tenor.com/NII4cFF4LIQAAAAd/group-texts-group-chats.gif": null,
+            "https://c.tenor.com/PhhN-3LjE3AAAAAd/gatto-cibo.gif": null
         }
     }
 }
