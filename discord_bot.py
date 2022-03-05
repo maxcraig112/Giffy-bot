@@ -336,7 +336,8 @@ def run_bot(TOKEN):
                         title = f"Search by {message.author}",
                         description=f"1/{len(urls)}",
                         colour = discord.Colour.blurple(),
-                        url= urls[0]
+                        url= urls[0],
+                        type="link"
                     )
                     embed.set_image(url=urls[0])
                     embed.add_field(name="tags",value=str(original_search_terms)[1:-1].replace("'",""))
@@ -629,9 +630,6 @@ def run_bot(TOKEN):
         except Exception as e:
             await message.channel.send(f"{e}, Oops! Something went wrong!")
     
-    @client.event
-    async def on_component(message):
-        print("PUSH")
     client.run(TOKEN)
 if __name__ == "__main__":
     # gifs = []

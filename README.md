@@ -5,30 +5,40 @@ The repos provides abstraction of these commands through the discord bot Giffy
 
 
 ## Current list of Bot Commands
-| First Header  | Second Header |
+### Image Manipulation Commands
+| Command  | Description |
 | ------------- | ------------- |
-| Content Cell  | Content Cell  |
-| Content Cell  | Content Cell  |
-| Content Cell  | Content Cell  |
-| Content Cell  | Content Cell  |
-| Content Cell  | Content Cell  |
-| Content Cell  | Content Cell  |
-| Content Cell  | Content Cell  |
-| Content Cell  | Content Cell  |
-| Content Cell  | Content Cell  |
-| Content Cell  | Content Cell  |
-| Content Cell  | Content Cell  |
-| Content Cell  | Content Cell  |
-| Content Cell  | Content Cell  |
-| Content Cell  | Content Cell  |
-| Content Cell  | Content Cell  |
-| Content Cell  | Content Cell  |
-| Content Cell  | Content Cell  |
-| Content Cell  | Content Cell  |
-| Content Cell  | Content Cell  |
-| Content Cell  | Content Cell  |
-| Content Cell  | Content Cell  |
-| Content Cell  | Content Cell  |
+| .caption [caption] | Content Cell  |
+| .decaption | Content Cell  |
+| .recaption [caption] | Content Cell  |
+| .reverse  | Content Cell  |
+| .speed  | Content Cell  |
+| .resize [factor] | Content Cell  |
+
+### Image Statistics
+| .cgif  | Content Cell  |
+| .text  | Content Cell  |
+| .tags  | Content Cell  |
+| .stats  | Content Cell  |
+| .comgif [gif]  | Content Cell  |
+| .sgif [gif]  | Content Cell  |
+
+### Gif Searching
+| .search [tag1,tag2,...]  | Content Cell  |
+| .asearch [tag1,tag2,...]  | Content Cell  |
+
+### Gif Retrieval
+| .lgif  | Content Cell  |
+| .rgif  | Content Cell  |
+| .rcgif  | Content Cell  |
+
+### Gif Scraping
+| .scrape  | Content Cell  |
+| .scrapeall  | Content Cell  |
+| .scrapeallx  | Content Cell  |
+
+### Debugging Tool
+| .test  | Content Cell  |
 
 Aims of the bot
 - Scraping caption gifs off tenor using API

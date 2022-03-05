@@ -41,7 +41,7 @@ def save_all_gifs(file_name,json_file,store_metadata=True):
 
 def convert_gifs(file_name):
     """
-    given a file of gif urls, replaces all cdn.discordapp.com url prefixes with media.discordapp.com, and removes any duplicates
+    given a file of gif urls, replaces all cdn.discordapp.com url prefixes with media.discordapp.com, edit tenor gifs and removes any duplicates
     """
     old_urls = []
     with open(file_name,"r") as f:
@@ -49,18 +49,30 @@ def convert_gifs(file_name):
     for i in range(len(old_urls)):
         old_urls[i] = ast.literal_eval(old_urls[i])
     new_urls = []
+    c = 0
     for i in old_urls:
-        if i[0][:26] == "https://cdn.discordapp.com":
-            i[0] = "https://media.discordapp.net" + i[0][26:]
-        if i not in new_urls:
-            new_urls += [i]
+        try:
+            print(f"{c}/{len(old_urls)}")
+            if i[0][:26] == "https://cdn.discordapp.com":
+                i[0] = "https://media.discordapp.net" + i[0][26:]
+            if "tenor" in i[0] and "c.tenor" not in i[0]:
+                #use BS4 to find exact url from html
+                r = requests.get(i[0], stream=True)
+                soup = BeautifulSoup(r.content, features="html.parser")
+                res = soup.findAll('div' , class_="Gif")
+                i[0] = res[0].img['src']
+            if i not in new_urls:
+                new_urls += [i]
+        except:
+            print(f"{i[0]}")
+        c += 1
     with open(file_name, "w") as f:
         for i in new_urls:
             f.write(f"{i}\n")
 
 def process_url(url_data, caption_json_file, uncaption_json_file, tags_json_file):
     """
-    given a url directory, downloads the image, processing it, obtaining it's metadata, and storing it in it's respective json file if it isn't already in the file.
+    given a url directory, downloads the image, processing it, obtaining it's metadata, and stores it in it's respective json file if it isn't already in the file.
     """
     #instantiate Gif object
     #open respective json
@@ -73,7 +85,7 @@ def process_url(url_data, caption_json_file, uncaption_json_file, tags_json_file
         url = AttachmentURL(url_data[0],url_data[1],url_data[2],url_data[3])
         #instantiate gif object
         gif = Gif(url.url,auto_download=True)
-        if gif._get_image(gif.img_reference):
+        if gif.img is not None:
             metadata = [url.guildID,url.channelID,url.userID]
             #if gif is a caption gif
             if gif.is_caption_gif():
@@ -119,25 +131,25 @@ def process_url(url_data, caption_json_file, uncaption_json_file, tags_json_file
             #print(archives.contains_alt_url(url,url.userID))
             archives.dump_json() #save json file
             return None
-    except:
+    except Exception as e:
+        print(e)
         print(url_data[0])
         return url_data
 
 if __name__ == "__main__":
     # save_all_gifs("All gifs/all_regular_gifs.txt","Json/archivedgifs.json")
-    # save_all_gifs("All gifs/all_caption_gifs.txt","Json/archivedcaptiongifs.json")
+    #save_all_gifs("All gifs/all_caption_gifs.txt","Json/archivedcaptiongifs.json")
     # convert_gifs("All gifs/all_regular_gifs.txt")
-    # convert_gifs("All gifs/all_caption_gifs.txt")
+    #convert_gifs("All gifs/all_caption_gifs.txt")
     
-    """
     caption_gifs = []
-    with open("All gifs/master_gif_file.txt","r") as f:
+    with open("All gifs/all_caption_gifs.txt","r") as f:
         caption_gifs = f.readlines()
     for i in range(len(caption_gifs)):
         caption_gifs[i] = ast.literal_eval(caption_gifs[i])
 
     failed_gifs = []
-    for i in range(3827,len(caption_gifs)):
+    for i in range(len(caption_gifs)):
         #print(caption_gifs[i])
         print(f"{i}/{len(caption_gifs)}")
         gif = process_url(caption_gifs[i],"testjson/archivedcaptiongifs.json","testjson/archivedgifs.json","testjson/tags.json")
@@ -148,7 +160,7 @@ if __name__ == "__main__":
     with open("failed_gifs.txt","w") as f:
         for i in failed_gifs:
             f.write(f"{i}\n")
-    """
+
     # f = open("All gifs/maxgifs.txt","r")
     # g = open("All gifs/tainegifs.txt","r")
     # gif1 = f.readlines()

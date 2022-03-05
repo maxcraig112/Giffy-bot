@@ -60,7 +60,7 @@ class Gif:
                 #attempt to request url data
                 r = requests.get(img, stream=True)
                 #if url is from Tenor
-                if "tenor" in img:
+                if "tenor" in img and "c.tenor" not in img:
                     #use BS4 to find exact url from html
                     soup = BeautifulSoup(r.content, features="html.parser")
                     res = soup.findAll('div' , class_="Gif")
@@ -484,6 +484,7 @@ class Gif:
         
     
 if __name__ == "__main__":
+    img = Gif("https://www.tenor.com/view/kitty-review-cat-insane-gif-21576551",auto_download=True)
     # img = Gif("https://tenor.com/view/jim-carrey-stoned-frozen-dead-inside-gif-15445047")
     # img.caption("try not to say deez nuts challenge")
     # img.save("test.gif")

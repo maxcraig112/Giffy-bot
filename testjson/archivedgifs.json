@@ -1,0 +1,56 @@
+{
+    "global": {
+        "https://media.discordapp.net/attachments/712243005519560736/877860027371749407/caption.gif": [
+            "470896999722516480",
+            "712243005519560736",
+            "217233850101661697"
+        ],
+        "https://media.discordapp.net/attachments/712243005519560736/837668084297891850/caption.gif": [
+            "470896999722516480",
+            "712243005519560736",
+            "217233850101661697"
+        ],
+        "https://media.discordapp.net/attachments/712243005519560736/837596569699745792/caption.gif": [
+            "470896999722516480",
+            "712243005519560736",
+            "217233850101661697"
+        ],
+        "https://media.discordapp.net/attachments/712243005519560736/837592872340684810/caption.gif": [
+            "470896999722516480",
+            "712243005519560736",
+            "217233850101661697"
+        ],
+        "https://media.discordapp.net/attachments/262067534482767872/807331042662285322/cool_chicken.gif": [
+            "470896999722516480",
+            "712243005519560736",
+            "217233850101661697"
+        ],
+        "https://media.discordapp.net/attachments/861429532234219540/867978603508428821/image0.gif": [
+            "470896999722516480",
+            "712243005519560736",
+            "158878635766317056"
+        ]
+    },
+    "guild": {
+        "470896999722516480": {
+            "https://media.discordapp.net/attachments/712243005519560736/877860027371749407/caption.gif": null,
+            "https://media.discordapp.net/attachments/712243005519560736/837668084297891850/caption.gif": null,
+            "https://media.discordapp.net/attachments/712243005519560736/837596569699745792/caption.gif": null,
+            "https://media.discordapp.net/attachments/712243005519560736/837592872340684810/caption.gif": null,
+            "https://media.discordapp.net/attachments/262067534482767872/807331042662285322/cool_chicken.gif": null,
+            "https://media.discordapp.net/attachments/861429532234219540/867978603508428821/image0.gif": null
+        }
+    },
+    "user": {
+        "217233850101661697": {
+            "https://media.discordapp.net/attachments/712243005519560736/877860027371749407/caption.gif": null,
+            "https://media.discordapp.net/attachments/712243005519560736/837668084297891850/caption.gif": null,
+            "https://media.discordapp.net/attachments/712243005519560736/837596569699745792/caption.gif": null,
+            "https://media.discordapp.net/attachments/712243005519560736/837592872340684810/caption.gif": null,
+            "https://media.discordapp.net/attachments/262067534482767872/807331042662285322/cool_chicken.gif": null
+        },
+        "158878635766317056": {
+            "https://media.discordapp.net/attachments/861429532234219540/867978603508428821/image0.gif": null
+        }
+    }
+}
