@@ -8,47 +8,47 @@ The repos provides abstraction of these commands through the discord bot Giffy
 ### Image Manipulation Commands
 | Command  | Description |
 | ------------- | ------------- |
-| .caption [caption] | Content Cell  |
-| .decaption | Content Cell  |
-| .recaption [caption] | Content Cell  |
-| .reverse  | Content Cell  |
-| .speed  | Content Cell  |
-| .resize [factor] | Content Cell  |
+| .caption [caption] | Captions last gif with text given  |
+| .decaption | Removes caption from last gif, if last gif does not contain a caption, returns exception |
+| .recaption [caption] | Removes caption from last gif, and captions gif with text given  |
+| .reverse  | Reverses gif  |
+| .speed [factor] | Increases speed of gif by factor  |
+| .resize [factor] | Resizes gif by factor |
 
 ### Image Statistics
 | Command  | Description |
 | ------------- | ------------- |
-| .cgif  | Content Cell  |
-| .text  | Content Cell  |
-| .tags  | Content Cell  |
-| .stats  | Content Cell  |
-| .comgif [gif]  | Content Cell  |
-| .sgif [gif]  | Content Cell  |
+| .cgif  | Returns whether or not the last gif was a caption gif  |
+| .text  | Returns caption text of last gif  |
+| .tags  | Returns generated tags of last gif  |
+| .stats  | Returns stats of uncaptioned last gif  |
+| .comgif [gif]  | Compares stats of last gif and given gif  |
+| .sgif [gif]  | Returns whether or not the uncaptioned last gif and given gif are the same  |
 
 ### Gif Searching
 | Command  | Description |
 | ------------- | ------------- |
-| .search [tag1,tag2,...]  | Content Cell  |
-| .asearch [tag1,tag2,...]  | Content Cell  |
+| .search [tag1,tag2,...]  | Searches json file, collating all gif urls under specified tags. Generates score from what proportion of each gif contains the tags, sorts from highest score, and returns via an embedded discord message.  |
+| .asearch [tag1,tag2,...]  | The same searching function as .search, however generates a gif which collates all search results into tiles. SHOULD BE REMOVED, takes forever to generate gif and is not an appealing format.  |
 
 ### Gif Retrieval
 | Command  | Description |
 | ------------- | ------------- |
-| .lgif  | Content Cell  |
-| .rgif  | Content Cell  |
-| .rcgif  | Content Cell  |
+| .lgif  | Returns the last gif seen by bot (stored in lastgif.json file)  |
+| .rgif  | Returns random gif in archivedgifs.json  |
+| .rcgif  | Returns random caption gif in archivedcaptiongifs.json  |
 
 ### Gif Scraping
 | Command  | Description |
 | ------------- | ------------- |
-| .scrape  | Content Cell  |
-| .scrapeall  | Content Cell  |
-| .scrapeallx  | Content Cell  |
+| .scrape  | Scrapes all unique urls in given channel, returning a txt file with url, Guild_ID, Channel_ID, User_ID  |
+| .scrapeall  | Scrapes all unique urls in given server, returning a txt file with url, Guild_ID, Channel_ID, User_ID  |
+| .scrapeallx  | Scrapes all unique urls in all servers the bot is in, returning a txt file with url, Guild_ID, Channel_ID, User_ID. This program takes forever and should not be ran.  |
 
 ### Debugging Tool
 | Command  | Description |
 | ------------- | ------------- |
-| .test  | Content Cell  |
+| .test  | Debugging command used for an assortment of code  |
 
 Aims of the bot
 - Scraping caption gifs off tenor using API
