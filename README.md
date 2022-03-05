@@ -50,14 +50,15 @@ The repos provides abstraction of these commands through the discord bot Giffy
 | ------------- | ------------- |
 | .test  | Debugging command used for an assortment of code  |
 
+### Exception Handling
+In the case of an error, an error message is sent to the channel in the format of 
+"{error}, Oops! Something went wrong!" 
+
 Aims of the bot
 - Scraping caption gifs off tenor using API
 - the user is able to enter a sentence to be used in a caption gif and the program can return an appropriate captionless gif to use
     - This could be achieved by analysing each word in the sentence, seperating it into nouns, adjectives, verbs. Then using those as search queries
     - Somehow scraping a large list of caption gifs, analysing the words they contain, grouping them together under similar subjects, and then using either a Neural Network or some   math to find the correct gif (certain words could link to gifs with a higher average red colour etc.) 
-
-USE NLTK FOR WORD PROCESSING
-CHECK THAT PIXEL 0,0 OF FIRST AND SECOND FRAME REMAINS CONSTANT
 
 # DONE:
 - Move json files to folder (DONE)
@@ -74,6 +75,7 @@ CHECK THAT PIXEL 0,0 OF FIRST AND SECOND FRAME REMAINS CONSTANT
 - bot can now compare text of 2 caption gifs and return whether they are 80% the same sequence (DONE)
 - bot can return whether or not it thinks 2 gifs are the same (caption and all) (DONE)
 - increased __init__ robustness by allowing url,PIL object and Gif Object instantiation
+- program for scraping urls from a channel using channel.history
 
 # TODO:
 - fix problems where it thinks certain white caption gifs are gifs, and where it thinks some caption gifs aren't gifs
@@ -92,7 +94,6 @@ CHECK THAT PIXEL 0,0 OF FIRST AND SECOND FRAME REMAINS CONSTANT
 - potentially make it so giffy can caption MP4, jpeg,png as well
 - refine stop_words list so that some words aren't removed
 - if .rgif or .rcgif are used, don't try and process those gifs
-- program for scraping urls from a channel using channel.history
 
 # TODO BEFORE MASS REPROCESSESSING
 - made it such that global tags hold data for all servers and users that have sent a gif
@@ -103,11 +104,3 @@ CHECK THAT PIXEL 0,0 OF FIRST AND SECOND FRAME REMAINS CONSTANT
  - https://pypi.org/project/discord.py-message-components/
  - https://pypi.org/project/discord-components/
  - https://stackoverflow.com/questions/67722188/add-button-components-to-a-message-discord-py
-
-
-
-# HOW TO MAKE BUTTON INTERACTIONS
-- everytime you search in a channel, store that message result interaction ID in a json, similar to last gif
-- when interaction is triggered, pull that ID with the list of gif results stored and increment
-- only allowed 1 per channel?? just to avoid clogging up everything
-- only person who searches can interact with buttons?
