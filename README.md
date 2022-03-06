@@ -81,6 +81,7 @@ Aims of the bot
 - reprocess all gifs again to include more metadata
 - Add better try,except code that's more robust for errors
 - Tenor gifs seen by giffy are converted into embed version before adding to archive
+- resulting .speed, .resize, .reverse gifs are not added to json
 
 # TODO:
 - fix problems where it thinks certain white caption gifs are gifs, and where it thinks some caption gifs aren't gifs (IMPOSSIBLE)
@@ -92,13 +93,3 @@ Aims of the bot
 - potentially make it so giffy can caption MP4, jpeg,png as well
 - refine stop_words list so that some words aren't removed
 - if .rgif or .rcgif are used, don't try and process those gifs
-
-# TODO BEFORE MASS REPROCESSESSING
-- made it such that global tags hold data for all servers and users that have sent a gif
-- actually figure out a robust way to find the caption of white gifs, and every gif 
-
-
- - https://discordpy-message-components.readthedocs.io/en/latest/
- - https://pypi.org/project/discord.py-message-components/
- - https://pypi.org/project/discord-components/
- - https://stackoverflow.com/questions/67722188/add-button-components-to-a-message-discord-py
