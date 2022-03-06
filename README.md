@@ -76,18 +76,16 @@ Aims of the bot
 - bot can return whether or not it thinks 2 gifs are the same (caption and all) (DONE)
 - increased __init__ robustness by allowing url,PIL object and Gif Object instantiation
 - program for scraping urls from a channel using channel.history
-
-# TODO:
-- fix problems where it thinks certain white caption gifs are gifs, and where it thinks some caption gifs aren't gifs
-- implement search by user,guild,global, maybe in class?
 - interface for searching gifs and getting result
 - create actual method for taking list of gifs
-- maybe make it so the order of search terms searched influences the score?
 - reprocess all gifs again to include more metadata
-- add functionality to select a gif from asearch to be sent fully to chat
-- add functionality which allows multiple pages of search
-- add functionality to allow gifs to be removed from database from search (if they're just bad or wrong)
 - Add better try,except code that's more robust for errors
+- Tenor gifs seen by giffy are converted into embed version before adding to archive
+
+# TODO:
+- fix problems where it thinks certain white caption gifs are gifs, and where it thinks some caption gifs aren't gifs (IMPOSSIBLE)
+- implement search by user,guild,global, maybe in class?
+- add functionality to allow gifs to be removed from database from search (if they're just bad or wrong)
 - create small thumbnails of gifs when storing in archives
 - if bot is captioning gif, automatically add to json with text inputted
     - create just stopwords for tags, keep all other words that are english

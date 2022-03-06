@@ -139,17 +139,17 @@ def process_url(url_data, caption_json_file, uncaption_json_file, tags_json_file
 if __name__ == "__main__":
     # save_all_gifs("All gifs/all_regular_gifs.txt","Json/archivedgifs.json")
     #save_all_gifs("All gifs/all_caption_gifs.txt","Json/archivedcaptiongifs.json")
-    # convert_gifs("All gifs/all_regular_gifs.txt")
+    #convert_gifs("All gifs/all_regular_gifs.txt")
     #convert_gifs("All gifs/all_caption_gifs.txt")
     
     caption_gifs = []
-    with open("All gifs/all_caption_gifs.txt","r") as f:
+    with open("All gifs/all_regular_gifs.txt","r") as f:
         caption_gifs = f.readlines()
     for i in range(len(caption_gifs)):
         caption_gifs[i] = ast.literal_eval(caption_gifs[i])
 
     failed_gifs = []
-    for i in range(530,len(caption_gifs)):
+    for i in range(len(caption_gifs)):
         #print(caption_gifs[i])
         print(f"{i}/{len(caption_gifs)}")
         gif = process_url(caption_gifs[i],"testjson/archivedcaptiongifs.json","testjson/archivedgifs.json","testjson/tags.json")

@@ -307,6 +307,7 @@ def run_bot(TOKEN):
                             
                             #dump new values into json
                             last_search_json(str(search_ID),str(interaction.guild_id),str(interaction.channel_id),str(interaction.user),gifs,i)
+                            
                         else:
                             #otherwise defer interaction, only original user is allowed to interact with search
                             await interaction.response.defer()
@@ -622,6 +623,7 @@ def run_bot(TOKEN):
                 last_gif_json(url)
                 #instantiate gif object
                 gif = Gif(url.url,auto_download=True)
+                url.url = gif.img_reference
                 data = [url.guildID,url.channelID,url.userID]
                 store_gif(url,gif,data)
         except Exception as e:
@@ -629,12 +631,6 @@ def run_bot(TOKEN):
     
     client.run(TOKEN)
 if __name__ == "__main__":
-    # gifs = []
-    # with open("taine_gifs.txt","r") as f:
-    #     gifs = f.readlines()
-    # guildID = "470896999722516480"
-    # channelID = "712243005519560736"
-    # userID = "158878635766317056"
 
     # failed_gifs = []
     # for i in range(1063,len(gifs)):

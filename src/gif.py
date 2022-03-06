@@ -45,6 +45,7 @@ class Gif:
         INPUT: String representing an image path of directory or url type
         OUTPUT: The original image path in PIL Image Object form
         """
+        res = None
         try:
             if type(img) != str:
                 if type(img) == PIL.GifImagePlugin.GifImageFile:
@@ -74,6 +75,9 @@ class Gif:
                 img = Image.open(img)
         except:
             return None
+        #if tenor gif was converted, make new image reference updated tenor
+        if res is not None:
+            self.img_reference = res
         self.img = img
         self.frames = self._get_frames()
         self.durations = self._get_duration()
