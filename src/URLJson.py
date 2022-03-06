@@ -172,12 +172,4 @@ class Tagger:
 
 
 if __name__ == "__main__":
-   tag = Tagger("max building essential highway infrastructure for the working class (they need fo commute to the CED) (Central Emerald District) while his entire team fails to defend the bed (they are very bad)")
-   print(tag.tags)
-    # captiongifs = JsonCaptionGifs("test.json")
-    # captiongifs.set_catagory("global")
-    # print(captiongifs.subdict)
-    # captiongifs.set_catagory("guild")
-    # print(captiongifs.subdict)
-    # captiongifs.set_catagory("user")
-    # print(captiongifs.subdict)
+    pass

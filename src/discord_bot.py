@@ -23,7 +23,6 @@ import time
 def run_bot(TOKEN):
 
     client = commands.Bot(command_prefix=".")
-    CAPTION_MADE = False
     def get_last(message):
         #get the last gif which was posted into the server
             with open("Json/lastgif.json", "r") as f:

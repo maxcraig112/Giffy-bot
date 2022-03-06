@@ -160,17 +160,4 @@ if __name__ == "__main__":
     with open("failed_gifs.txt","w") as f:
         for i in failed_gifs:
             f.write(f"{i}\n")
-
-    # f = open("All gifs/maxgifs.txt","r")
-    # g = open("All gifs/tainegifs.txt","r")
-    # gif1 = f.readlines()
-    # gif2 = g.readlines()
-    # for i in range(len(gif1)):
-    #     gif1[i] = [gif1[i].strip(),470896999722516480,514393245191634947,217233850101661697]
-    # for i in range(len(gif2)):
-    #     gif2[i] = [gif2[i].strip(),470896999722516480,514393245191634947,158878635766317056]
-    # combined = gif1 + gif2
-    # with open("All gifs/maxtainegifs.txt","w") as h:
-    #     for i in combined:
-    #         h.write(f"{i}\n")
     
