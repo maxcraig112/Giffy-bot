@@ -88,6 +88,7 @@ Future aims of the bot
 - resulting .speed, .resize, .reverse gifs are not added to json
 
 # TODO:
+- add embedding to all commands
 - fix problems where it thinks certain white caption gifs are gifs, and where it thinks some caption gifs aren't gifs (IMPOSSIBLE)
 - implement search by user,guild,global, maybe in class?
 - add functionality to allow gifs to be removed from database from search (if they're just bad or wrong)
