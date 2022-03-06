@@ -146,6 +146,10 @@ def run_bot(TOKEN):
     async def on_message(message):
         msg = message.content.lower()
         try:
+            if msg == ".giffy":
+                await message.channel.send("I am giffy! A multipurpose discord bot designed to allow the manipulation, tagging, archiving and retrieval of gifs!\n\nIf you need help with commands, type .help!\n\n**Invite Link**\nhttps://discord.com/api/oauth2/authorize?client_id=893293074413916230&permissions=36768320&scope=bot \n\nhttps://cdn.discordapp.com/attachments/846175975560839178/949934549570322482/846175975560839178_470896999722516480.gif")
+            if msg == ".help":
+                await message.channel.send("WIP")
             if msg == ".test":
                 gifs = ["https://media.discordapp.net/attachments/712243005519560736/947711699706855474/712243005519560736_470896999722516480.gif","https://tenor.com/view/burrito-pass-peepohappy-gif-18706235","https://media.discordapp.net/attachments/690819748929470475/923615350677991445/rhfp8exd29781.gif"]
                 i = 0
@@ -633,67 +637,8 @@ def run_bot(TOKEN):
     
     client.run(TOKEN)
 if __name__ == "__main__":
-
-    # failed_gifs = []
-    # for i in range(1063,len(gifs)):
-    #     try:
-    #         ^
-    #         url = AttachmentURL(gifs[i].strip(),guildID,channelID,userID)
-    #         #instantiate gif object
-    #         gif = Gif(url.url,auto_download=True)
-    #         if gif._get_image(gif.img_reference):
-    #             data = [url.guildID,url.channelID,url.userID]
-    #             #if gif is a caption gif
-    #             if gif.is_caption_gif():
-    #                 caption = gif.text_from_caption() #get caption
-    #                 tags = Tagger(caption).tags #get tags
-    #                 data += [tags]
-    #                 #await message.channel.send(tags)
-    #                 tags_json = JsonGifs("Json/tags.json")
-    #                 for tag in tags:
-    #                     tags_json.set_catagory('global')
-    #                     tags_json.addsubKey(tag)
-    #                     if not tags_json.contains_alt_url(url,subkey=tag):
-    #                         tags_json.add(url.url,data[:-1],tag)
-    #                     tags_json.set_catagory('guild')
-    #                     tags_json.addsubKey(url.guildID)
-    #                     tags_json.addsubsubKey(url.guildID,tag)
-    #                     if not tags_json.contains_alt_url(url,url.guildID,tag):
-    #                         tags_json.add(url.url,data[:-1],url.guildID,tag)
-    #                     tags_json.set_catagory('user')
-    #                     tags_json.addsubKey(url.userID)
-    #                     tags_json.addsubsubKey(url.userID,tag)
-    #                     if not tags_json.contains_alt_url(url,url.userID,tag):
-    #                         tags_json.add(url.url,data[:-1],url.userID,tag)
-    #                 tags_json.dump_json()
-
-    #             #instantiate json archiving object, file open depends on whether gif contains a caption
-    #             archives = JsonGifs("Json/archivedcaptiongifs.json" if gif.is_caption_gif() else "Json/archivedgifs.json","global")
-    #             if not archives.contains_alt_url(url):
-    #                 archives.add(url.url,data) #add url to global key
-    #             #print(archives.contains_alt_url(url))
-    #             archives.set_catagory("guild") #set catagory to guild key
-                
-    #             archives.addsubKey(url.guildID) #if server ID not in guild key, add, then add url to server ID
-    #             if not archives.contains_alt_url(url,url.guildID):
-    #                 archives.add(url.url,None,url.guildID)
-    #             #print(archives.contains_alt_url(url,url.guildID))
-    #             archives.set_catagory("user") #if user ID not in user key, add, then add url to user ID
-                
-    #             archives.addsubKey(url.userID)
-    #             if not archives.contains_alt_url(url,url.userID):
-    #                 archives.add(url.url,None,url.userID)
-    #             #print(archives.contains_alt_url(url,url.userID))
-    #             archives.dump_json() #save json file
-    #     except:
-    #         print(gifs[i])
-    #         failed_gifs += [gifs[i]]
-    # else:
-    #     print(gifs[i])
-    #     failed_gifs += [gifs[i]]
     with open('C:/Users/maxcr/Desktop/Executables/giffytoken.txt') as f:
         TOKEN = f.readline()
     run_bot(TOKEN)
-    #https://discord.com/api/oauth2/authorize?client_id=893293074413916230&permissions=36768320&scope=bot
-    #https://discord.com/api/oauth2/authorize?client_id=893293074413916230&permissions=8&scope=bot
-    #https://discordpy.readthedocs.io/en/stable/api.html#
+
+#https://discord.com/api/oauth2/authorize?client_id=893293074413916230&permissions=36768320&scope=bot

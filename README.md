@@ -3,6 +3,8 @@ A multipurpose repos designed to allow the manipulation, tagging, archiving and 
 
 This repos provides abstraction of these commands through the discord bot Giffy.
 
+**Invite Link**
+https://discord.com/api/oauth2/authorize?client_id=893293074413916230&permissions=36768320&scope=bot
 
 ## Current list of Bot Commands
 ### Image Manipulation Commands
@@ -48,17 +50,19 @@ This repos provides abstraction of these commands through the discord bot Giffy.
 ### Debugging Tool
 | Command  | Description |
 | ------------- | ------------- |
+| .giffy  | A link to github and a general description of the bot  |
+| .help  | A list of commands  |
 | .test  | Debugging command used for an assortment of code  |
 
 ### Exception Handling
 In the case of an error, an error message is sent to the channel in the format of 
 "{error}, Oops! Something went wrong!" 
 
-Aims of the bot
+Future aims of the bot
 - Scraping caption gifs off tenor using API
 - the user is able to enter a sentence to be used in a caption gif and the program can return an appropriate captionless gif to use
     - This could be achieved by analysing each word in the sentence, seperating it into nouns, adjectives, verbs. Then using those as search queries
-    - Somehow scraping a large list of caption gifs, analysing the words they contain, grouping them together under similar subjects, and then using either a Neural Network or some   math to find the correct gif (certain words could link to gifs with a higher average red colour etc.) 
+    - Somehow scraping a large list of caption gifs, analysing the words they contain, grouping them together under similar subjects, and then using either a Neural Network or some math to find the correct gif (certain words could link to gifs with a higher average red colour etc.) 
 
 # DONE:
 - Move json files to folder (DONE)
