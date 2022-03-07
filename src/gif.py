@@ -489,16 +489,3 @@ class Gif:
     
 if __name__ == "__main__":
     img = Gif("https://www.tenor.com/view/kitty-review-cat-insane-gif-21576551",auto_download=True)
-    # img = Gif("https://tenor.com/view/jim-carrey-stoned-frozen-dead-inside-gif-15445047")
-    # img.caption("try not to say deez nuts challenge")
-    # img.save("test.gif")
-    # img.resize(0.5)
-    # img.save("test2.gif")
-    # img = Gif("Tester Files/test4.gif",auto_download=True)
-    # print(img.stats(decaption=False))
-    # print(img.stats(decaption=False,frame=1))
-    img = Gif("https://media.discordapp.net/attachments/869864347449577512/905769617945935902/869864347449577512_741169124817764372.gif",auto_download=True)
-    
-
-    #get image file of frame[0]
-    #get image file of frames[1]
