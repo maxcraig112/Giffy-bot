@@ -98,3 +98,10 @@ Future aims of the bot
 - potentially make it so giffy can caption MP4, jpeg,png as well
 - refine stop_words list so that some words aren't removed
 - if .rgif or .rcgif are used, don't try and process those gifs
+
+# More commands to add
+- bounce (similar to instagrams boomarang editing)
+- invert - inverts the entire gif
+- freeze - stops auto-replay of the gif
+- grey - converts image to grayscale
+- add custom text to gifs which are not properly read
