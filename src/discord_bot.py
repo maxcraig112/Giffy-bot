@@ -148,7 +148,21 @@ def run_bot(TOKEN):
         msg = message.content.lower()
         try:
             if msg == ".giffy":
-                await message.channel.send("I am giffy! A multipurpose discord bot designed to allow the manipulation, tagging, archiving and retrieval of gifs!\n\nIf you need help with commands, type .help!\n\n**Invite Link**\nhttps://discord.com/api/oauth2/authorize?client_id=893293074413916230&permissions=36768320&scope=bot \n\nhttps://cdn.discordapp.com/attachments/846175975560839178/949934549570322482/846175975560839178_470896999722516480.gif")
+                embed=discord.Embed(
+                    title="Who am I?", 
+                    url="https://github.com/Jumpingeal/Giffy-bot", 
+                    description="I am giffy! A multipurpose discord bot designed to allow the manipulation, tagging, archiving and retrieval of gifs!")
+                embed.set_author(
+                    name="Jumpingeal#8353", 
+                    url="https://github.com/Jumpingeal", 
+                    icon_url="https://cdn.discordapp.com/attachments/846175975560839178/950204054754177124/cool_obama.jpg")
+                embed.add_field(
+                    name="Help",
+                    value="If you need help with commands, type .help!", 
+                    inline=True)
+                embed.set_image(url="https://c.tenor.com/oylHwLtwhbsAAAAC/gif-jif.gif")
+                await message.channel.send(embed=embed)
+                #await message.channel.send("I am giffy! A multipurpose discord bot designed to allow the manipulation, tagging, archiving and retrieval of gifs!\n\nIf you need help with commands, type .help!\n\n**Invite Link**\nhttps://discord.com/api/oauth2/authorize?client_id=893293074413916230&permissions=36768320&scope=bot \n\nhttps://cdn.discordapp.com/attachments/846175975560839178/949934549570322482/846175975560839178_470896999722516480.gif")
             if msg == ".help":
                 await message.channel.send("WIP")
             if msg == ".test":
