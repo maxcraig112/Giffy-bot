@@ -5429,6 +5429,21 @@
             "470896999722516480",
             "846175975560839178",
             "893293074413916230"
+        ],
+        "https://c.tenor.com/KjJTBQ9lftsAAAAC/why-huh.gif": [
+            "470896999722516480",
+            "846175975560839178",
+            "217233850101661697"
+        ],
+        "https://media.tenor.com/images/0a74922439d02f6426347e15929ff0f4/tenor.gif": [
+            "470896999722516480",
+            "846175975560839178",
+            "429305856241172480"
+        ],
+        "https://cdn.discordapp.com/attachments/846175975560839178/950217438295892018/846175975560839178_470896999722516480.gif": [
+            "470896999722516480",
+            "846175975560839178",
+            "893293074413916230"
         ]
     },
     "guild": {
@@ -6450,7 +6465,10 @@
             "https://c.tenor.com/GMOvEqEbrGwAAAAC/the-office-steve-carell.gif": null,
             "https://cdn.discordapp.com/attachments/846175975560839178/949934549570322482/846175975560839178_470896999722516480.gif": null,
             "https://c.tenor.com/MXfP0HsRNnYAAAAd/troll-trolled.gif": null,
-            "https://cdn.discordapp.com/attachments/846175975560839178/950158651837005834/846175975560839178_470896999722516480.gif": null
+            "https://cdn.discordapp.com/attachments/846175975560839178/950158651837005834/846175975560839178_470896999722516480.gif": null,
+            "https://c.tenor.com/KjJTBQ9lftsAAAAC/why-huh.gif": null,
+            "https://media.tenor.com/images/0a74922439d02f6426347e15929ff0f4/tenor.gif": null,
+            "https://cdn.discordapp.com/attachments/846175975560839178/950217438295892018/846175975560839178_470896999722516480.gif": null
         },
         "553451524131389452": {
             "https://c.tenor.com/UljEXyj1JwsAAAAd/gamestop.gif": null,
@@ -7008,7 +7026,8 @@
             "https://c.tenor.com/6_raNShPqZEAAAAC/adam-levine-embarrassed.gif": null,
             "https://cdn.discordapp.com/attachments/846175975560839178/949929271986634812/846175975560839178_470896999722516480.gif": null,
             "https://c.tenor.com/GMOvEqEbrGwAAAAC/the-office-steve-carell.gif": null,
-            "https://c.tenor.com/MXfP0HsRNnYAAAAd/troll-trolled.gif": null
+            "https://c.tenor.com/MXfP0HsRNnYAAAAd/troll-trolled.gif": null,
+            "https://c.tenor.com/KjJTBQ9lftsAAAAC/why-huh.gif": null
         },
         "158878635766317056": {
             "https://media.discordapp.net/attachments/861429532234219540/867978603508428821/image0.gif": null,
@@ -7621,7 +7640,8 @@
             "https://c.tenor.com/_TM16qRHnfsAAAAd/jebac_teosia.gif": null,
             "https://media.discordapp.net/attachments/724976219757609030/764274070752985129/video0_62.gif": null,
             "https://c.tenor.com/Z6uHH2k0_vEAAAAd/understandable-have-nice-day.gif": null,
-            "https://c.tenor.com/oylHwLtwhbsAAAAC/gif-jif.gif": null
+            "https://c.tenor.com/oylHwLtwhbsAAAAC/gif-jif.gif": null,
+            "https://cdn.discordapp.com/attachments/846175975560839178/950217438295892018/846175975560839178_470896999722516480.gif": null
         },
         "379440775206797385": {
             "https://c.tenor.com/gZbCG-jAThoAAAAC/typing-petty.gif": null,
@@ -7646,7 +7666,8 @@
         },
         "429305856241172480": {
             "https://media.discordapp.net/attachments/869864347449577512/905770095475826728/captionTwo.gif": null,
-            "https://media.discordapp.net/attachments/869864347449577512/905770185800167424/globe.gif": null
+            "https://media.discordapp.net/attachments/869864347449577512/905770185800167424/globe.gif": null,
+            "https://media.tenor.com/images/0a74922439d02f6426347e15929ff0f4/tenor.gif": null
         }
     }
 }
