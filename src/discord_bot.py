@@ -18,6 +18,7 @@ from URLJson import *
 import timeit
 from copy import copy
 from statistics import mean
+import time
 
 def run_bot(TOKEN):
 
@@ -45,7 +46,7 @@ def run_bot(TOKEN):
     async def no_gif_found(message):
         await message.channel.send("No previous gifs found in channel. This may be because I haven't been in the server long or I was offline when a gif was sent!")
     
-    async def resize_and_send(gif, message, no_json = False):
+    async def resize_and_send(gif, message, no_json = False, send = True):
         tag = "xxx" if no_json else ""
         gif.save(f"{message.channel.id}_{message.guild.id}{tag}.gif")
         while os.path.getsize(f"{message.channel.id}_{message.guild.id}{tag}.gif") > 8000000:
@@ -54,10 +55,12 @@ def run_bot(TOKEN):
             print("resizing")
             gif.resize(0.75)
             gif.save(f"{message.channel.id}_{message.guild.id}{tag}.gif")
-        
-        await message.channel.send(file=discord.File(f"{message.channel.id}_{message.guild.id}{tag}.gif"))
-        del gif
-        os.remove(f"{message.channel.id}_{message.guild.id}{tag}.gif")
+        if send:
+            await message.channel.send(file=discord.File(f"{message.channel.id}_{message.guild.id}{tag}.gif"))
+            os.remove(f"{message.channel.id}_{message.guild.id}{tag}.gif")
+            del gif
+        else:
+            return f"{message.channel.id}_{message.guild.id}{tag}.gif"      
 
     def gif_is_sent(message):
         if len(message.attachments) > 0 and os.path.splitext(message.attachments[-1].filename)[-1] == ".gif": # validators.url(message.attachments[-1].url) and 
@@ -228,6 +231,7 @@ def run_bot(TOKEN):
                 if search_terms == [""]:
                     await message.channel.send("Please type command followed by search terms!")
                 else:
+                    start_time = time.time()
                     original_search_terms = search_terms[:]
                     for i in range(len(search_terms)):
                         if search_terms[i][-1] != "s":
@@ -345,6 +349,7 @@ def run_bot(TOKEN):
                         )
                         embed.set_image(url=urls[0])
                         embed.add_field(name="tags",value=str(original_search_terms)[1:-1].replace("'",""))
+                        embed.set_footer(text=f"Total tags: {size}, total results: {len(urls)}, time taken to search: {round(time.time() - start_time,2)} seconds")
 
                         button_msg = await message.channel.send(embed=embed, view=view)
 
@@ -511,12 +516,22 @@ def run_bot(TOKEN):
                 if len(text) == 1:
                     await message.channel.send("Please type command followed by a factor!")
                 else:
+                    start_time = time.time()
                     factor = float(text[1])
                     gif = Gif(get_last(message),auto_download=True)
                     if gif.img != None:
                         await message.channel.send("Speeding up gif!")
                         gif.change_speed(factor=factor)
-                        await resize_and_send(gif, message, no_json = True)
+                        path = await resize_and_send(gif, message, no_json = True, send = False)
+                        embed = Embed(
+                            description=f"Factor: {factor}",
+                            colour = discord.Colour.blurple(),
+                        )
+                        file = discord.File(path)
+                        embed.set_image(url="attachment://"+path)
+                        embed.set_footer(text=f"{gif.width}x{gif.height}, {len(gif.frames)} frames, {round(os.path.getsize(path)/1000000,2)}MB, took {round(time.time() - start_time,1)} seconds")
+                        await message.channel.send(embed=embed,file=file)
+                        os.remove(path)
                     else:
                         await no_gif_found(message)
             if msg.split(" ")[0] == ".resize":
@@ -524,24 +539,44 @@ def run_bot(TOKEN):
                 if len(text) == 1:
                     await message.channel.send("Please type command followed by a factor!")
                 else:
+                    start_time = time.time()
                     factor = float(text[1])
                     gif = Gif(get_last(message),auto_download=True)
                     if gif.img != None:
                         if gif.width * factor > 2500 or gif.height * factor > 2500:
                             await message.channel.send("You're going to break my fucking computer don't resize it this much")
                         else:
-                            await message.channel.send("Resizing gif!")
+                            await message.channel.send("Resizing up gif!")
                             gif.resize(factor)
-                            await resize_and_send(gif,message,no_json = True)
+                            path = await resize_and_send(gif, message, no_json = True, send = False)
+                            embed = Embed(
+                                description=f"Factor: {factor}",
+                                colour = discord.Colour.blurple(),
+                            )
+                            file = discord.File(path)
+                            embed.set_image(url="attachment://"+path)
+                            embed.set_footer(text=f"{gif.width}x{gif.height}, {len(gif.frames)} frames, {round(os.path.getsize(path)/1000000,2)}MB, took {round(time.time() - start_time,1)} seconds")
+                            await message.channel.send(embed=embed,file=file)
+                            os.remove(path)
                     else:
                         await no_gif_found(message)
             if msg == ".reverse":
+                start_time = time.time()
                 gif = Gif(get_last(message),auto_download=True)
                 if gif.img != None:
                     await message.channel.send("Reversing gif!")
                     gif.frames.reverse()
                     gif.durations.reverse()
-                    await resize_and_send(gif,message,no_json = True)
+                    await resize_and_send(gif,message,no_json = True, send=False)
+                    embed = Embed(
+                        description=f"Factor: {factor}",
+                        colour = discord.Colour.blurple(),
+                    )
+                    file = discord.File(path)
+                    embed.set_image(url="attachment://"+path)
+                    embed.set_footer(text=f"{gif.width}x{gif.height}, {len(gif.frames)} frames, {round(os.path.getsize(path)/1000000,2)}MB, took {round(time.time() - start_time,1)} seconds")
+                    await message.channel.send(embed=embed,file=file)
+                    os.remove(path)
                 else:
                     await no_gif_found(message)
             if msg == ".stats":
