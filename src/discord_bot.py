@@ -147,39 +147,117 @@ def run_bot(TOKEN):
     async def on_message(message):
         msg = message.content.lower()
         try:
-            if msg == ".giffy":
-                embed=discord.Embed(
-                    title="Who am I?", 
-                    url="https://github.com/Jumpingeal/Giffy-bot", 
-                    description="I am giffy! A multipurpose discord bot designed to allow the manipulation, tagging, archiving and retrieval of gifs!")
-                embed.set_author(
-                    name="Jumpingeal#8353", 
-                    url="https://github.com/Jumpingeal", 
-                    icon_url="https://cdn.discordapp.com/attachments/846175975560839178/950204054754177124/cool_obama.jpg")
-                embed.add_field(
-                    name="Help",
-                    value="If you need help with commands, type .help!", 
-                    inline=True)
-                embed.set_image(url="https://c.tenor.com/oylHwLtwhbsAAAAC/gif-jif.gif")
-                await message.channel.send(embed=embed)
-                #await message.channel.send("I am giffy! A multipurpose discord bot designed to allow the manipulation, tagging, archiving and retrieval of gifs!\n\nIf you need help with commands, type .help!\n\n**Invite Link**\nhttps://discord.com/api/oauth2/authorize?client_id=893293074413916230&permissions=36768320&scope=bot \n\nhttps://cdn.discordapp.com/attachments/846175975560839178/949934549570322482/846175975560839178_470896999722516480.gif")
-            if msg == ".help":
-                await message.channel.send("WIP")
-            if msg == ".test":
-                gifs = ["https://media.discordapp.net/attachments/712243005519560736/947711699706855474/712243005519560736_470896999722516480.gif","https://tenor.com/view/burrito-pass-peepohappy-gif-18706235","https://media.discordapp.net/attachments/690819748929470475/923615350677991445/rhfp8exd29781.gif"]
-                i = 0
+            #region Image Manipulation Commands
+            if msg.split(" ")[0] == ".caption":
+                text = message.content.split(" ", 1)
+                if len(text) == 1:
+                    await message.channel.send("Please type command followed by a caption!")
+                else:
+                    text = text[1]
+                    await message.channel.send("Captioning gif! give me a second to work!")
+                    gif = Gif(get_last(message),auto_download=True)
+                    if gif.img != None:
+                        gif.caption(text)
+                        await resize_and_send(gif, message)
+                    else:
+                        await no_gif_found(message)
+            if msg == ".decaption":
+                await message.channel.send("Decaptioning gif! give me a second to work!")
+                gif = Gif(get_last(message),auto_download=True)
+                if gif.img != None:
+                    if gif.is_caption_gif():
+                        gif.decaption()
+                        await resize_and_send(gif, message)
+                    else:
+                        await message.channel.send("Previous gif does not contain a caption")
+                else:
+                    await no_gif_found(message)
+            if msg.split(" ")[0] == ".recaption":
+                text = message.content.split(" ", 1)
+                if len(text) == 1:
+                    await message.channel.send("Please type command followed by a caption!")
+                else:
+                    text = text[1]
+                    if text != "":
+                        await message.channel.send("Recaptioning gif! give me a second to work!")
+                        gif = Gif(get_last(message),auto_download=True)
+                        if gif.img != None:
+                            gif.decaption()
+                            gif.caption(text)
+                            await resize_and_send(gif, message)
+                        else:
+                            await no_gif_found(message)
+            if msg == ".reverse":
+                start_time = time.time()
+                gif = Gif(get_last(message),auto_download=True)
+                if gif.img != None:
+                    await message.channel.send("Reversing gif!")
+                    gif.frames.reverse()
+                    gif.durations.reverse()
+                    await resize_and_send(gif,message,no_json = True, send=False)
+                    embed = Embed(
+                        description=f"Factor: {factor}",
+                        colour = discord.Colour.blurple(),
+                    )
+                    file = discord.File(path)
+                    embed.set_image(url="attachment://"+path)
+                    embed.set_footer(text=f"{gif.width}x{gif.height}, {len(gif.frames)} frames, {round(os.path.getsize(path)/1000000,2)}MB, took {round(time.time() - start_time,1)} seconds")
+                    await message.channel.send(embed=embed,file=file)
+                    os.remove(path)
+                else:
+                    await no_gif_found(message)
+            if msg.split(" ")[0] == ".speed":
+                text = message.content.split(" ", 1)
+                if len(text) == 1:
+                    await message.channel.send("Please type command followed by a factor!")
+                else:
+                    start_time = time.time()
+                    factor = float(text[1])
+                    gif = Gif(get_last(message),auto_download=True)
+                    if gif.img != None:
+                        await message.channel.send("Speeding up gif!")
+                        gif.change_speed(factor=factor)
+                        path = await resize_and_send(gif, message, no_json = True, send = False)
+                        embed = Embed(
+                            description=f"Factor: {factor}",
+                            colour = discord.Colour.blurple(),
+                        )
+                        file = discord.File(path)
+                        embed.set_image(url="attachment://"+path)
+                        embed.set_footer(text=f"{gif.width}x{gif.height}, {len(gif.frames)} frames, {round(os.path.getsize(path)/1000000,2)}MB, took {round(time.time() - start_time,1)} seconds")
+                        await message.channel.send(embed=embed,file=file)
+                        os.remove(path)
+                    else:
+                        await no_gif_found(message)
+            if msg.split(" ")[0] == ".resize":
+                text = message.content.split(" ", 1)
+                if len(text) == 1:
+                    await message.channel.send("Please type command followed by a factor!")
+                else:
+                    start_time = time.time()
+                    factor = float(text[1])
+                    gif = Gif(get_last(message),auto_download=True)
+                    if gif.img != None:
+                        if gif.width * factor > 2500 or gif.height * factor > 2500:
+                            await message.channel.send("You're going to break my fucking computer don't resize it this much")
+                        else:
+                            await message.channel.send("Resizing up gif!")
+                            gif.resize(factor)
+                            path = await resize_and_send(gif, message, no_json = True, send = False)
+                            embed = Embed(
+                                description=f"Factor: {factor}",
+                                colour = discord.Colour.blurple(),
+                            )
+                            file = discord.File(path)
+                            embed.set_image(url="attachment://"+path)
+                            embed.set_footer(text=f"{gif.width}x{gif.height}, {len(gif.frames)} frames, {round(os.path.getsize(path)/1000000,2)}MB, took {round(time.time() - start_time,1)} seconds")
+                            await message.channel.send(embed=embed,file=file)
+                            os.remove(path)
+                    else:
+                        await no_gif_found(message)
+            #endregion
 
-                async def prev_gif_callback(interaction):
-                    await interaction.response.send_message("previous gif")
-
-                async def next_gif_callback(interaction):
-                    await interaction.response.send_message("next gif")
-                prev_button = Button(label='Previous Gif',custom_id='prev_gif',style=discord.ButtonStyle.blurple)
-                next_button = Button(label='Next Gif',custom_id='next_gif',style=discord.ButtonStyle.blurple)
-                prev_button.callback = prev_gif_callback
-                next_button.callback = next_gif_callback
-                view = View(prev_button,next_button)
-                button_msg = await message.channel.send(view=view)
+            #region Image Statistics
             if msg == ".cgif":
                 gif = Gif(get_last(message),auto_download=True)
                 #gif._get_image(gif.img_reference)
@@ -190,26 +268,6 @@ def run_bot(TOKEN):
                         await message.channel.send("The last gif does not have a caption")
                 else:
                     await no_gif_found(message)
-            if msg == ".rgif":
-                # open archived gifs, get random url from global
-                archive = JsonGifs("Json/archivedgifs.json","global")
-                count = 0
-                maxx = random.randrange(0,len(archive))
-                for i in archive.subdict:
-                    if count == maxx:
-                        await message.channel.send(i)
-                        break
-                    count += 1
-            if msg == ".rcgif":
-                # open archived gifs, get random url from global
-                archive = JsonGifs("Json/archivedcaptiongifs.json","global")
-                count = 0
-                maxx = random.randrange(0,len(archive))
-                for i in archive.subdict:
-                    if count == maxx:
-                        await message.channel.send(i)
-                        break
-                    count += 1
             if msg == ".text":
                 gif = Gif(get_last(message),auto_download=True)
                 if gif.img != None:
@@ -234,12 +292,46 @@ def run_bot(TOKEN):
                 print(text)
                 tags = Tagger(text).tags #get tags
                 await message.channel.send(tags)
-            if msg == ".lgif":
-                gif = get_last(message)
-                if gif != "" and gif != None:
-                    await message.channel.send(gif)
+            if msg == ".stats":
+                gif = Gif(get_last(message),auto_download=True)
+                if gif.img != None:
+                    stats = gif.stats()
+                    await message.channel.send(f"Ratio: {stats[0]}\nMean: {stats[1]}\nMedian: {stats[2]}\nrms: {stats[3]}\nvar: {stats[4]}\nstd dev: {stats[5]}")  
                 else:
                     await no_gif_found(message)
+            if msg.split(" ")[0] == ".comgif":
+                text = message.content.split(" ",1)
+                if len(text) == 1:
+                    await message.channel.send("Please type command followed by gif to compare!")
+                else:
+                    gif1 = Gif(get_last(message),auto_download=True)
+                    message.content = text[1]
+                    if gif_is_sent(message) != None:
+                        dif = gif1.stats_dif(gif_is_sent(message))
+                        same = gif1.is_same_gif(gif_is_sent(message))
+                        await message.channel.send(f"Ratio Dif: {dif[0]}\nMean Dif: {dif[1]}\nMedian Dif (doesn't influence comp): {dif[2]}\nrms dif: {dif[3]}\nvar dif: {dif[4]}\nstd dev dif: {dif[5]}\nSame gif: {same}") 
+                    else:
+                        await message.channel.send("Link sent is not valid gif!")
+            if msg.split(" ")[0] == ".sgif":
+                text = message.content.split(" ",1)
+                if len(text) == 1:
+                    await message.channel.send("Please type command followed by gif to compare!")
+                else:
+                    gif1 = Gif(get_last(message),auto_download=True)
+                    message.content = text[1]
+                    if gif_is_sent(message) != None:
+                        gif2 = Gif(gif_is_sent(message),auto_download=True)
+                        # print(gif1.frames[0])
+                        # print(gif2.frames[0])
+                        if gif1.is_same_caption_gif(gif2):
+                            await message.channel.send("These gifs are the same")
+                        else:
+                            await message.channel.send("These gifs are not the same")
+                    else:
+                        await message.channel.send("Link sent is not valid gif!")
+            #endregion
+
+            #region Gif Searching
             if msg[:7] == ".search":
                 search_terms = msg[8:].replace(" ","").lower().split(",")
                 if search_terms == [""]:
@@ -247,9 +339,12 @@ def run_bot(TOKEN):
                 else:
                     start_time = time.time()
                     original_search_terms = search_terms[:]
+                    #Add singular and plural version of search term to list
                     for i in range(len(search_terms)):
                         if search_terms[i][-1] != "s":
                             search_terms += [search_terms[i] + "s"]
+                        else:
+                            search_terms += [search_terms[i][:-1]]
                     urls = []
                     scores = []
                     max_tags = []
@@ -486,150 +581,38 @@ def run_bot(TOKEN):
                         #os.remove("search.gif")
                     else:
                         await message.channel.send("sorry! no caption gifs with those tags can be found!")
-            if msg == ".decaption":
-                await message.channel.send("Decaptioning gif! give me a second to work!")
-                gif = Gif(get_last(message),auto_download=True)
-                if gif.img != None:
-                    if gif.is_caption_gif():
-                        gif.decaption()
-                        await resize_and_send(gif, message)
-                    else:
-                        await message.channel.send("Previous gif does not contain a caption")
+            #endregion
+
+            #region Gif Retrieval
+            if msg == ".lgif":
+                gif = get_last(message)
+                if gif != "" and gif != None:
+                    await message.channel.send(gif)
                 else:
                     await no_gif_found(message)
-            if msg.split(" ")[0] == ".caption":
-                text = message.content.split(" ", 1)
-                if len(text) == 1:
-                    await message.channel.send("Please type command followed by a caption!")
-                else:
-                    text = text[1]
-                    await message.channel.send("Captioning gif! give me a second to work!")
-                    gif = Gif(get_last(message),auto_download=True)
-                    if gif.img != None:
-                        gif.caption(text)
-                        await resize_and_send(gif, message)
-                    else:
-                        await no_gif_found(message)
-            if msg.split(" ")[0] == ".recaption":
-                text = message.content.split(" ", 1)
-                if len(text) == 1:
-                    await message.channel.send("Please type command followed by a caption!")
-                else:
-                    text = text[1]
-                    if text != "":
-                        await message.channel.send("Recaptioning gif! give me a second to work!")
-                        gif = Gif(get_last(message),auto_download=True)
-                        if gif.img != None:
-                            gif.decaption()
-                            gif.caption(text)
-                            await resize_and_send(gif, message)
-                        else:
-                            await no_gif_found(message)
-            if msg.split(" ")[0] == ".speed":
-                text = message.content.split(" ", 1)
-                if len(text) == 1:
-                    await message.channel.send("Please type command followed by a factor!")
-                else:
-                    start_time = time.time()
-                    factor = float(text[1])
-                    gif = Gif(get_last(message),auto_download=True)
-                    if gif.img != None:
-                        await message.channel.send("Speeding up gif!")
-                        gif.change_speed(factor=factor)
-                        path = await resize_and_send(gif, message, no_json = True, send = False)
-                        embed = Embed(
-                            description=f"Factor: {factor}",
-                            colour = discord.Colour.blurple(),
-                        )
-                        file = discord.File(path)
-                        embed.set_image(url="attachment://"+path)
-                        embed.set_footer(text=f"{gif.width}x{gif.height}, {len(gif.frames)} frames, {round(os.path.getsize(path)/1000000,2)}MB, took {round(time.time() - start_time,1)} seconds")
-                        await message.channel.send(embed=embed,file=file)
-                        os.remove(path)
-                    else:
-                        await no_gif_found(message)
-            if msg.split(" ")[0] == ".resize":
-                text = message.content.split(" ", 1)
-                if len(text) == 1:
-                    await message.channel.send("Please type command followed by a factor!")
-                else:
-                    start_time = time.time()
-                    factor = float(text[1])
-                    gif = Gif(get_last(message),auto_download=True)
-                    if gif.img != None:
-                        if gif.width * factor > 2500 or gif.height * factor > 2500:
-                            await message.channel.send("You're going to break my fucking computer don't resize it this much")
-                        else:
-                            await message.channel.send("Resizing up gif!")
-                            gif.resize(factor)
-                            path = await resize_and_send(gif, message, no_json = True, send = False)
-                            embed = Embed(
-                                description=f"Factor: {factor}",
-                                colour = discord.Colour.blurple(),
-                            )
-                            file = discord.File(path)
-                            embed.set_image(url="attachment://"+path)
-                            embed.set_footer(text=f"{gif.width}x{gif.height}, {len(gif.frames)} frames, {round(os.path.getsize(path)/1000000,2)}MB, took {round(time.time() - start_time,1)} seconds")
-                            await message.channel.send(embed=embed,file=file)
-                            os.remove(path)
-                    else:
-                        await no_gif_found(message)
-            if msg == ".reverse":
-                start_time = time.time()
-                gif = Gif(get_last(message),auto_download=True)
-                if gif.img != None:
-                    await message.channel.send("Reversing gif!")
-                    gif.frames.reverse()
-                    gif.durations.reverse()
-                    await resize_and_send(gif,message,no_json = True, send=False)
-                    embed = Embed(
-                        description=f"Factor: {factor}",
-                        colour = discord.Colour.blurple(),
-                    )
-                    file = discord.File(path)
-                    embed.set_image(url="attachment://"+path)
-                    embed.set_footer(text=f"{gif.width}x{gif.height}, {len(gif.frames)} frames, {round(os.path.getsize(path)/1000000,2)}MB, took {round(time.time() - start_time,1)} seconds")
-                    await message.channel.send(embed=embed,file=file)
-                    os.remove(path)
-                else:
-                    await no_gif_found(message)
-            if msg == ".stats":
-                gif = Gif(get_last(message),auto_download=True)
-                if gif.img != None:
-                    stats = gif.stats()
-                    await message.channel.send(f"Ratio: {stats[0]}\nMean: {stats[1]}\nMedian: {stats[2]}\nrms: {stats[3]}\nvar: {stats[4]}\nstd dev: {stats[5]}")  
-                else:
-                    await no_gif_found(message)
-            if msg.split(" ")[0] == ".comgif":
-                text = message.content.split(" ",1)
-                if len(text) == 1:
-                    await message.channel.send("Please type command followed by gif to compare!")
-                else:
-                    gif1 = Gif(get_last(message),auto_download=True)
-                    message.content = text[1]
-                    if gif_is_sent(message) != None:
-                        dif = gif1.stats_dif(gif_is_sent(message))
-                        same = gif1.is_same_gif(gif_is_sent(message))
-                        await message.channel.send(f"Ratio Dif: {dif[0]}\nMean Dif: {dif[1]}\nMedian Dif (doesn't influence comp): {dif[2]}\nrms dif: {dif[3]}\nvar dif: {dif[4]}\nstd dev dif: {dif[5]}\nSame gif: {same}") 
-                    else:
-                        await message.channel.send("Link sent is not valid gif!")
-            if msg.split(" ")[0] == ".sgif":
-                text = message.content.split(" ",1)
-                if len(text) == 1:
-                    await message.channel.send("Please type command followed by gif to compare!")
-                else:
-                    gif1 = Gif(get_last(message),auto_download=True)
-                    message.content = text[1]
-                    if gif_is_sent(message) != None:
-                        gif2 = Gif(gif_is_sent(message),auto_download=True)
-                        # print(gif1.frames[0])
-                        # print(gif2.frames[0])
-                        if gif1.is_same_caption_gif(gif2):
-                            await message.channel.send("These gifs are the same")
-                        else:
-                            await message.channel.send("These gifs are not the same")
-                    else:
-                        await message.channel.send("Link sent is not valid gif!")
+            if msg == ".rgif":
+                # open archived gifs, get random url from global
+                archive = JsonGifs("Json/archivedgifs.json","global")
+                count = 0
+                maxx = random.randrange(0,len(archive))
+                for i in archive.subdict:
+                    if count == maxx:
+                        await message.channel.send(i)
+                        break
+                    count += 1
+            if msg == ".rcgif":
+                # open archived gifs, get random url from global
+                archive = JsonGifs("Json/archivedcaptiongifs.json","global")
+                count = 0
+                maxx = random.randrange(0,len(archive))
+                for i in archive.subdict:
+                    if count == maxx:
+                        await message.channel.send(i)
+                        break
+                    count += 1
+            #endregion
+
+            #region Gif Scraping
             if msg == ".scrape":
                 """
                 scrapes all unique valid gif urls sent in channel 
@@ -696,6 +679,50 @@ def run_bot(TOKEN):
                         f.write(f"{i}\n")
                 await message.channel.send(f"{len(gif_urls)} unique gif urls successfully scraped",file=discord.File("full_gif_scrape.txt"))
                 os.remove("full_gif_scrape.txt")
+            #endregion
+
+            #region Debugging Tools
+            if msg == ".giffy":
+                embed=discord.Embed(
+                    title="Who am I?", 
+                    url="https://github.com/Jumpingeal/Giffy-bot", 
+                    description="I am giffy! A multipurpose discord bot designed to allow the manipulation, tagging, archiving and retrieval of gifs!",
+                    colour = discord.Colour.blurple())
+                embed.set_author(
+                    name="Jumpingeal#8353", 
+                    url="https://github.com/Jumpingeal", 
+                    icon_url="https://cdn.discordapp.com/attachments/846175975560839178/950204054754177124/cool_obama.jpg")
+                embed.add_field(
+                    name="Help",
+                    value="If you need help with commands, type .help!", 
+                    inline=False)
+                embed.add_field(
+                    name="Searching",
+                    value="All unique gifs sent in a server I'm in will automatically be catagorised and archived!\n\nThis means that if you ever have a gif that you're dying to use, but can't find, you can simply type .search [tag] and I'll try my best to find it for you!", 
+                    inline=False)
+                embed.set_image(url="https://c.tenor.com/oylHwLtwhbsAAAAC/gif-jif.gif")
+                await message.channel.send(embed=embed)
+                #await message.channel.send("I am giffy! A multipurpose discord bot designed to allow the manipulation, tagging, archiving and retrieval of gifs!\n\nIf you need help with commands, type .help!\n\n**Invite Link**\nhttps://discord.com/api/oauth2/authorize?client_id=893293074413916230&permissions=36768320&scope=bot \n\nhttps://cdn.discordapp.com/attachments/846175975560839178/949934549570322482/846175975560839178_470896999722516480.gif")
+            if msg == ".help":
+                await message.channel.send("WIP")
+            if msg == ".test":
+                gifs = ["https://media.discordapp.net/attachments/712243005519560736/947711699706855474/712243005519560736_470896999722516480.gif","https://tenor.com/view/burrito-pass-peepohappy-gif-18706235","https://media.discordapp.net/attachments/690819748929470475/923615350677991445/rhfp8exd29781.gif"]
+                i = 0
+
+                async def prev_gif_callback(interaction):
+                    await interaction.response.send_message("previous gif")
+
+                async def next_gif_callback(interaction):
+                    await interaction.response.send_message("next gif")
+                prev_button = Button(label='Previous Gif',custom_id='prev_gif',style=discord.ButtonStyle.blurple)
+                next_button = Button(label='Next Gif',custom_id='next_gif',style=discord.ButtonStyle.blurple)
+                prev_button.callback = prev_gif_callback
+                next_button.callback = next_gif_callback
+                view = View(prev_button,next_button)
+                button_msg = await message.channel.send(view=view)
+            #endregion
+            
+            #If gif is sent to channel and has not had .speed, .reverse or .resize done to it
             if gif_is_sent(message) != None and gif_is_sent(message)[-7:] != "xxx.gif":
                 #create URLAttachment Object containing url location data
                 url = AttachmentURL(gif_is_sent(message),message.guild.id,message.channel.id,message.author.id)
@@ -706,6 +733,7 @@ def run_bot(TOKEN):
                 url.url = gif.img_reference
                 data = [url.guildID,url.channelID,url.userID]
                 store_gif(url,gif,data)
+        #Exception catching
         except Exception as e:
             await message.channel.send(f"{e}, Oops! Something went wrong!")
     
