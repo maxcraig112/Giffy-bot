@@ -140,7 +140,7 @@ def run_bot(TOKEN):
     @client.event
     async def on_ready():
         print("Bot is ready")
-        activity = discord.Activity(type=discord.ActivityType.watching, name="for any gifs")
+        activity = discord.Activity(type=discord.ActivityType.watching, name="for gifs | .giffy")
         await client.change_presence(status=discord.Status.online,activity=activity)
 
     @client.event
