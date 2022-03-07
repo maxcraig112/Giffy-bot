@@ -200,7 +200,7 @@ def run_bot(TOKEN):
                     if text != None:
                         await message.channel.send(text)
                     else:
-                        await message.channel.send("no text found")
+                        await message.channel.send("No text found")
                 else:
                     await no_gif_found(message)
             if msg == ".tags":
@@ -351,7 +351,7 @@ def run_bot(TOKEN):
                         #store search made by that user in that channel in that server to json
                         last_search_json(str(view.id),str(message.guild.id),str(message.channel.id),str(message.author),urls,0)
                     else:
-                        await message.channel.send("sorry! no caption gifs with those tags can be found!")
+                        await message.channel.send("Sorry! no caption gifs with those tags can be found!")
             if msg[:8] == ".asearch":
                 org_terms = msg[8:].replace(" ","").lower().split(",")
                 search_terms = msg[8:].replace(" ","").lower().split(",")
@@ -468,23 +468,23 @@ def run_bot(TOKEN):
                     else:
                         await message.channel.send("sorry! no caption gifs with those tags can be found!")
             if msg == ".decaption":
-                await message.channel.send("decaptioning gif! give me a second to work!")
+                await message.channel.send("Decaptioning gif! give me a second to work!")
                 gif = Gif(get_last(message),auto_download=True)
                 if gif.img != None:
                     if gif.is_caption_gif():
                         gif.decaption()
                         await resize_and_send(gif, message)
                     else:
-                        await message.channel.send("previous gif does not contain a caption")
+                        await message.channel.send("Previous gif does not contain a caption")
                 else:
                     await no_gif_found(message)
             if msg.split(" ")[0] == ".caption":
                 text = message.content.split(" ", 1)
                 if len(text) == 1:
-                    await message.channel.send("please type command followed by a caption!")
+                    await message.channel.send("Please type command followed by a caption!")
                 else:
                     text = text[1]
-                    await message.channel.send("captioning gif! give me a second to work!")
+                    await message.channel.send("Captioning gif! give me a second to work!")
                     gif = Gif(get_last(message),auto_download=True)
                     if gif.img != None:
                         gif.caption(text)
@@ -494,11 +494,11 @@ def run_bot(TOKEN):
             if msg.split(" ")[0] == ".recaption":
                 text = message.content.split(" ", 1)
                 if len(text) == 1:
-                    await message.channel.send("please type command followed by a caption!")
+                    await message.channel.send("Please type command followed by a caption!")
                 else:
                     text = text[1]
                     if text != "":
-                        await message.channel.send("recaptioning gif! give me a second to work!")
+                        await message.channel.send("Recaptioning gif! give me a second to work!")
                         gif = Gif(get_last(message),auto_download=True)
                         if gif.img != None:
                             gif.decaption()
@@ -509,12 +509,12 @@ def run_bot(TOKEN):
             if msg.split(" ")[0] == ".speed":
                 text = message.content.split(" ", 1)
                 if len(text) == 1:
-                    await message.channel.send("please type command followed by a factor!")
+                    await message.channel.send("Please type command followed by a factor!")
                 else:
                     factor = float(text[1])
                     gif = Gif(get_last(message),auto_download=True)
                     if gif.img != None:
-                        await message.channel.send("speeding up gif!")
+                        await message.channel.send("Speeding up gif!")
                         gif.change_speed(factor=factor)
                         await resize_and_send(gif, message, no_json = True)
                     else:
@@ -522,15 +522,15 @@ def run_bot(TOKEN):
             if msg.split(" ")[0] == ".resize":
                 text = message.content.split(" ", 1)
                 if len(text) == 1:
-                    await message.channel.send("please type command followed by a factor!")
+                    await message.channel.send("Please type command followed by a factor!")
                 else:
                     factor = float(text[1])
                     gif = Gif(get_last(message),auto_download=True)
                     if gif.img != None:
                         if gif.width * factor > 2500 or gif.height * factor > 2500:
-                            await message.channel.send("you're going to break my fucking computer don't resize it this much")
+                            await message.channel.send("You're going to break my fucking computer don't resize it this much")
                         else:
-                            await message.channel.send("resizing gif!")
+                            await message.channel.send("Resizing gif!")
                             gif.resize(factor)
                             await resize_and_send(gif,message,no_json = True)
                     else:
@@ -538,7 +538,7 @@ def run_bot(TOKEN):
             if msg == ".reverse":
                 gif = Gif(get_last(message),auto_download=True)
                 if gif.img != None:
-                    await message.channel.send("reversing gif!")
+                    await message.channel.send("Reversing gif!")
                     gif.frames.reverse()
                     gif.durations.reverse()
                     await resize_and_send(gif,message,no_json = True)
@@ -563,7 +563,7 @@ def run_bot(TOKEN):
                         same = gif1.is_same_gif(gif_is_sent(message))
                         await message.channel.send(f"Ratio Dif: {dif[0]}\nMean Dif: {dif[1]}\nMedian Dif (doesn't influence comp): {dif[2]}\nrms dif: {dif[3]}\nvar dif: {dif[4]}\nstd dev dif: {dif[5]}\nSame gif: {same}") 
                     else:
-                        await message.channel.send("link sent is not valid gif!")
+                        await message.channel.send("Link sent is not valid gif!")
             if msg.split(" ")[0] == ".sgif":
                 text = message.content.split(" ",1)
                 if len(text) == 1:
@@ -580,7 +580,7 @@ def run_bot(TOKEN):
                         else:
                             await message.channel.send("These gifs are not the same")
                     else:
-                        await message.channel.send("link sent is not valid gif!")
+                        await message.channel.send("Link sent is not valid gif!")
             if msg == ".scrape":
                 """
                 scrapes all unique valid gif urls sent in channel 
