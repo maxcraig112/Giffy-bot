@@ -11,7 +11,7 @@ from gif import Gif
 from validators.url import url
 import discord
 import validators
-from discord import Colour, Embed
+from discord import Colour, DMChannel, Embed
 from discord.ext import commands
 from discord.ui import Button, View
 from URLJson import *
@@ -19,6 +19,7 @@ import timeit
 from copy import copy
 from statistics import mean
 import time
+import copy
 
 def run_bot(TOKEN):
 
@@ -145,6 +146,8 @@ def run_bot(TOKEN):
 
     @client.event
     async def on_message(message):
+        # if isinstance(message.channel, discord.channel.DMChannel):
+        #     await message.channel.send("FUCK YOU")
         msg = message.content.lower()
         try:
             #region Image Manipulation Commands
@@ -255,6 +258,29 @@ def run_bot(TOKEN):
                             os.remove(path)
                     else:
                         await no_gif_found(message)
+            if msg == ".bounce":
+                start_time = time.time()
+                gif = Gif(get_last(message),auto_download=True)
+                if gif.img != None:
+                    await message.channel.send("Bouncing gif!")
+                    new_frames = gif.frames[:]
+                    new_duration = gif.durations[:]
+                    new_frames.reverse()
+                    new_duration.reverse()
+                    gif.frames += new_frames
+                    gif.durations += new_duration
+                    await resize_and_send(gif,message,no_json = True, send=False)
+                    embed = Embed(
+                        colour = discord.Colour.blurple(),
+                    )
+                    file = discord.File(path)
+                    embed.set_image(url="attachment://"+path)
+                    embed.set_footer(text=f"{gif.width}x{gif.height}, {len(gif.frames)} frames, {round(os.path.getsize(path)/1000000,2)}MB, took {round(time.time() - start_time,1)} seconds")
+                    await message.channel.send(embed=embed,file=file)
+                    os.remove(path)
+                else:
+                    await no_gif_found(message)
+
             #endregion
 
             #region Image Statistics

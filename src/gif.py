@@ -191,7 +191,8 @@ class Gif:
                 self.img = self._get_image(self.img_reference)
 
             if self.img != None:
-                image = self.frames[1]
+                #get 2nd frame of gif, unless gif is only 1 frame
+                image = self.frames[0] if len(self.frames) == 1 else self.frames[1]
                 background = image.getpixel((5,0))
                 rang = range(220,256)
                 if(background[0] in rang and background[1] in rang and background[2] in rang and background[3] != 0):
@@ -228,7 +229,8 @@ class Gif:
         """
         boundary = self.get_boundary()
         if boundary != None:
-            caption = self.frames[1].crop((0,0,boundary[0],boundary[1]))
+            #get caption from 2nd frame, unless gif is only 1 frame
+            caption = self.frames[0].crop((0,0,boundary[0],boundary[1])) if len(self.frames) == 1 else self.frames[1].crop((0,0,boundary[0],boundary[1]))
             return caption
         return None
     
