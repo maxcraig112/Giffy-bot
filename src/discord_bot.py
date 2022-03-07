@@ -724,7 +724,7 @@ def run_bot(TOKEN):
                     inline=False)
                 embed.add_field(
                     name="Searching",
-                    value="All unique gifs sent in a server I'm in will automatically be catagorised and archived!\n\nThis means that if you ever have a gif that you're dying to use, but can't find, you can simply type .search [tag] and I'll try my best to find it for you!", 
+                    value="All unique gifs sent in a server I'm in will automatically be catagorised and archived!\n\nThis means that if you ever have a caption gif that you're dying to use, but can't find, you can simply type .search [tag] and I'll try my best to find it for you!", 
                     inline=False)
                 embed.set_image(url="https://c.tenor.com/oylHwLtwhbsAAAAC/gif-jif.gif")
                 await message.channel.send(embed=embed)
