@@ -23,6 +23,7 @@ https://discord.com/api/oauth2/authorize?client_id=893293074413916230&permission
 | .cgif  | Returns whether or not the last gif was a caption gif  |
 | .text  | Returns caption text of last gif  |
 | .tags  | Returns generated tags of last gif  |
+| .ttags [text] | Returns the generated tags from the inputted text  |
 | .stats  | Returns stats of uncaptioned last gif  |
 | .comgif [gif]  | Compares stats of last gif and given gif  |
 | .sgif [gif]  | Returns whether or not the uncaptioned last gif and given gif are the same  |
@@ -105,3 +106,4 @@ Future aims of the bot
 - freeze - stops auto-replay of the gif
 - grey - converts image to grayscale
 - add custom text to gifs which are not properly read
+- add interaction via DM's
