@@ -40,5 +40,6 @@ def prefix_gif():
     return unique
         
 if __name__ == "__main__":
-    extract("max_gif_raw.txt","maxgifs.txt")
-    extract("taine_gif_raw.txt","tainegifs.txt")
+    extract("All gifs/alexgif.txt","alex.txt")
+    #extract("max_gif_raw.txt","maxgifs.txt")
+    #extract("taine_gif_raw.txt","tainegifs.txt")

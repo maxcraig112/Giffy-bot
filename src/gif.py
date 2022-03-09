@@ -11,7 +11,7 @@ from typing import Text
 import requests
 import urllib.request
 from shutil import *
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont, ImageOps
 from PIL.ImageStat import Stat
 import numpy as np
 from pytesseract import *
@@ -387,6 +387,13 @@ class Gif:
             self.img = self._get_image(self.img_reference)
 
         self.frames = [self.frames[i] for i in range(0,len(self.frames),int(1/factor))]
+    
+    def invert(self):
+        #Inverts the gif
+        if self.img is None:
+            self.img = self._get_image(self.img_reference)
+        for i in range(len(self.frames)):
+            self.frames[i] = ImageOps.invert(self.frames[i].convert("RGB"))
     #endregion
 
     #region Image Stat Methods
@@ -466,12 +473,16 @@ class Gif:
     #endregion
 
     #region Image Storing/Showing Methods
-    def save(self, file_name: str = None, path: str = None):
+    def save(self, file_name: str = None, path: str = None, loop = True):
         if self.img is None:
             self.img = self._get_image(self.img_reference)
 
         file_name = self._get_file_name(file_name,path)
-        self.frames[0].save(file_name, format="GIF",append_images=self.frames[1:],save_all=True,loop = 0, duration=self.durations)
+        if loop:
+            self.frames[0].save(file_name, format="GIF",append_images=self.frames[1:],save_all=True,loop = 0, duration=self.durations)
+        else:
+            self.frames[0].save(file_name, format="GIF",append_images=self.frames[1:],save_all=True, duration=self.durations)
+        
     
     def show(self):
         if self.img is None:

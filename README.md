@@ -16,13 +16,15 @@ https://discord.com/api/oauth2/authorize?client_id=893293074413916230&permission
 | .reverse  | Reverses gif  |
 | .speed [factor] | Increases speed of gif by factor  |
 | .resize [factor] | Resizes gif by factor |
-
+| .bounce | Bounces the gif |
+| .invert | Inverts the gif |
 ### Image Statistics
 | Command  | Description |
 | ------------- | ------------- |
 | .cgif  | Returns whether or not the last gif was a caption gif  |
 | .text  | Returns caption text of last gif  |
 | .tags  | Returns generated tags of last gif  |
+| .ttags [text] | Returns the generated tags from the inputted text  |
 | .stats  | Returns stats of uncaptioned last gif  |
 | .comgif [gif]  | Compares stats of last gif and given gif  |
 | .sgif [gif]  | Returns whether or not the uncaptioned last gif and given gif are the same  |
@@ -86,6 +88,8 @@ Future aims of the bot
 - Add better try,except code that's more robust for errors
 - Tenor gifs seen by giffy are converted into embed version before adding to archive
 - resulting .speed, .resize, .reverse gifs are not added to json
+- bounce (similar to instagrams boomarang editing)
+- invert - inverts the entire gif
 
 # TODO:
 - add embedding to all commands
@@ -100,8 +104,8 @@ Future aims of the bot
 - if .rgif or .rcgif are used, don't try and process those gifs
 
 # More commands to add
-- bounce (similar to instagrams boomarang editing)
-- invert - inverts the entire gif
+
 - freeze - stops auto-replay of the gif
 - grey - converts image to grayscale
 - add custom text to gifs which are not properly read
+- add interaction via DM's

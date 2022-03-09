@@ -47,15 +47,15 @@ def run_bot(TOKEN):
     async def no_gif_found(message):
         await message.channel.send("No previous gifs found in channel. This may be because I haven't been in the server long or I was offline when a gif was sent!")
     
-    async def resize_and_send(gif, message, no_json = False, send = True):
+    async def resize_and_send(gif, message, no_json = False, send = True, loop = True):
         tag = "xxx" if no_json else ""
-        gif.save(f"{message.channel.id}_{message.guild.id}{tag}.gif")
+        gif.save(f"{message.channel.id}_{message.guild.id}{tag}.gif",loop=loop)
         while os.path.getsize(f"{message.channel.id}_{message.guild.id}{tag}.gif") > 8000000:
             #await message.channel.send("Caption too big! resizing!")
             gif = Gif(f"{message.channel.id}_{message.guild.id}{tag}.gif")
             print("resizing")
             gif.resize(0.75)
-            gif.save(f"{message.channel.id}_{message.guild.id}{tag}.gif")
+            gif.save(f"{message.channel.id}_{message.guild.id}{tag}.gif",loop=loop)
         if send:
             await message.channel.send(file=discord.File(f"{message.channel.id}_{message.guild.id}{tag}.gif"))
             os.remove(f"{message.channel.id}_{message.guild.id}{tag}.gif")
@@ -64,7 +64,7 @@ def run_bot(TOKEN):
             return f"{message.channel.id}_{message.guild.id}{tag}.gif"      
 
     def gif_is_sent(message):
-        if len(message.attachments) > 0 and os.path.splitext(message.attachments[-1].filename)[-1] == ".gif": # validators.url(message.attachments[-1].url) and 
+        if len(message.attachments) > 0 and os.path.splitext(message.attachments[-1].filename)[-1] in [".gif"]: # validators.url(message.attachments[-1].url) and 
             return message.attachments[-1].url
         if validators.url(message.content) and (message.content[-4:] == ".gif" or "tenor" in message.content):
             return message.content
@@ -138,6 +138,19 @@ def run_bot(TOKEN):
         #print(archives.contains_alt_url(url,url.userID))
 
         archives.dump_json() #save json file
+    
+    async def send_embed(message,gif,start_time,loop = True):
+        path = await resize_and_send(gif,message,no_json = True, send=False, loop=loop)
+        file = discord.File(path)
+        embed = Embed(
+            colour = discord.Colour.blurple(),
+        )
+        file = discord.File(path)
+        embed.set_image(url="attachment://"+path)
+        embed.set_footer(text=f"{gif.width}x{gif.height}, {len(gif.frames)} frames, {round(os.path.getsize(path)/1000000,2)}MB, took {round(time.time() - start_time,1)} seconds")
+        await message.channel.send(embed=embed,file=file)
+        os.remove(path)
+    
     @client.event
     async def on_ready():
         print("Bot is ready")
@@ -220,16 +233,7 @@ def run_bot(TOKEN):
                     if gif.img != None:
                         await message.channel.send("Speeding up gif!")
                         gif.change_speed(factor=factor)
-                        path = await resize_and_send(gif, message, no_json = True, send = False)
-                        embed = Embed(
-                            description=f"Factor: {factor}",
-                            colour = discord.Colour.blurple(),
-                        )
-                        file = discord.File(path)
-                        embed.set_image(url="attachment://"+path)
-                        embed.set_footer(text=f"{gif.width}x{gif.height}, {len(gif.frames)} frames, {round(os.path.getsize(path)/1000000,2)}MB, took {round(time.time() - start_time,1)} seconds")
-                        await message.channel.send(embed=embed,file=file)
-                        os.remove(path)
+                        await send_embed(message,gif,start_time)
                     else:
                         await no_gif_found(message)
             if msg.split(" ")[0] == ".resize":
@@ -246,16 +250,7 @@ def run_bot(TOKEN):
                         else:
                             await message.channel.send("Resizing up gif!")
                             gif.resize(factor)
-                            path = await resize_and_send(gif, message, no_json = True, send = False)
-                            embed = Embed(
-                                description=f"Factor: {factor}",
-                                colour = discord.Colour.blurple(),
-                            )
-                            file = discord.File(path)
-                            embed.set_image(url="attachment://"+path)
-                            embed.set_footer(text=f"{gif.width}x{gif.height}, {len(gif.frames)} frames, {round(os.path.getsize(path)/1000000,2)}MB, took {round(time.time() - start_time,1)} seconds")
-                            await message.channel.send(embed=embed,file=file)
-                            os.remove(path)
+                            await send_embed(message,gif,start_time)
                     else:
                         await no_gif_found(message)
             if msg == ".bounce":
@@ -269,18 +264,29 @@ def run_bot(TOKEN):
                     new_duration.reverse()
                     gif.frames += new_frames
                     gif.durations += new_duration
-                    await resize_and_send(gif,message,no_json = True, send=False)
-                    embed = Embed(
-                        colour = discord.Colour.blurple(),
-                    )
-                    file = discord.File(path)
-                    embed.set_image(url="attachment://"+path)
-                    embed.set_footer(text=f"{gif.width}x{gif.height}, {len(gif.frames)} frames, {round(os.path.getsize(path)/1000000,2)}MB, took {round(time.time() - start_time,1)} seconds")
-                    await message.channel.send(embed=embed,file=file)
-                    os.remove(path)
+                    await send_embed(message,gif,start_time)
                 else:
                     await no_gif_found(message)
-
+            if msg == ".invert":
+                start_time = time.time()
+                gif = Gif(get_last(message),auto_download=True)
+                if gif.img != None:
+                    await message.channel.send("Inverting gif!")
+                    gif.invert()
+                    path = await resize_and_send(gif,message,no_json = True, send=False)
+                    file = discord.File(path)
+                    await send_embed(message,path,file,start_time,gif)
+                    
+                else:
+                    await no_gif_found(message)
+            if msg == ".freeze":
+                start_time = time.time()
+                gif = Gif(get_last(message),auto_download=True)
+                if gif.img != None:
+                    await message.channel.send("Freezing gif!")
+                    await send_embed(message,gif,start_time,loop=False)
+                else:
+                    await no_gif_found(message)
             #endregion
 
             #region Image Statistics
@@ -724,7 +730,7 @@ def run_bot(TOKEN):
                     inline=False)
                 embed.add_field(
                     name="Searching",
-                    value="All unique gifs sent in a server I'm in will automatically be catagorised and archived!\n\nThis means that if you ever have a gif that you're dying to use, but can't find, you can simply type .search [tag] and I'll try my best to find it for you!", 
+                    value="All unique gifs sent in a server I'm in will automatically be catagorised and archived!\n\nThis means that if you ever have a caption gif that you're dying to use, but can't find, you can simply type .search [tag] and I'll try my best to find it for you!", 
                     inline=False)
                 embed.set_image(url="https://c.tenor.com/oylHwLtwhbsAAAAC/gif-jif.gif")
                 await message.channel.send(embed=embed)
@@ -749,16 +755,18 @@ def run_bot(TOKEN):
             #endregion
             
             #If gif is sent to channel and has not had .speed, .reverse or .resize done to it
-            if gif_is_sent(message) != None and gif_is_sent(message)[-7:] != "xxx.gif":
+            if gif_is_sent(message) != None:
                 #create URLAttachment Object containing url location data
                 url = AttachmentURL(gif_is_sent(message),message.guild.id,message.channel.id,message.author.id)
                 #update the last gif sent in the guild and channel in the JSON file
                 last_gif_json(url)
-                #instantiate gif object
-                gif = Gif(url.url,auto_download=True)
-                url.url = gif.img_reference
-                data = [url.guildID,url.channelID,url.userID]
-                store_gif(url,gif,data)
+                if gif_is_sent(message)[-7:] != "xxx.gif":
+                    
+                    #instantiate gif object
+                    gif = Gif(url.url,auto_download=True)
+                    url.url = gif.img_reference
+                    data = [url.guildID,url.channelID,url.userID]
+                    store_gif(url,gif,data)
         #Exception catching
         except Exception as e:
             await message.channel.send(f"{e}, Oops! Something went wrong!")
