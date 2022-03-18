@@ -302,6 +302,8 @@ class Gif:
             while j + 1 < len(words) and ImageFont.truetype(FONT_PATH, font_size).getsize(line + words[j+1] + " ")[0] <= MAX_SIZE:
                 # go to next word
                 j += 1
+                if words[j] == "\\n":
+                    break
                 # add word + space to line
                 line += " " + words[j]
             # when can no longer fit more words, or ran out of words, add new line to list of lines
