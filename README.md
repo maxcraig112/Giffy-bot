@@ -92,6 +92,7 @@ Future aims of the bot
 - invert - inverts the entire gif
 
 # TODO:
+- imgcaption, where instead of using text as a caption you can use an image
 - add embedding to all commands
 - fix problems where it thinks certain white caption gifs are gifs, and where it thinks some caption gifs aren't gifs (IMPOSSIBLE)
 - implement search by user,guild,global, maybe in class?

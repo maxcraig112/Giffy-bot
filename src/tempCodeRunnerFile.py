@@ -1,1 +1,0 @@
-and (message.content[-4:] == ".gif" or "tenor" in message.content):
